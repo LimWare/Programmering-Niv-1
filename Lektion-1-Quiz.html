@@ -77,7 +77,7 @@
           🏆
         </div>
         <h2 class="text-3xl font-extrabold text-white mb-2">Quizet är klart!</h2>
-        <p class="text-slate-400 mb-6 text-sm">Bra jobbat med genomgången av hela Lektion 1!</p>
+        <p class="text-slate-400 mb-6 text-sm">Bra jobbat med genomgången av Lektion 1!</p>
 
         <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-8">
           <div class="bg-slate-850 p-4 rounded-2xl border border-slate-800">
@@ -108,303 +108,243 @@
     const quizData = [
       {
         category: "Grundbegrepp",
-        question: "Vad är ett programmeringsspråk i grunden?",
+        question: "Vad är den primära skillnaden mellan maskinkod och källkod skriven i ett programmeringsspråk?",
         options: [
-          "Ett operativsystem som styr hårdvarans interna fläktar",
-          "Ett språk som en människa använder för att skapa instruktioner och datorprogram",
-          "En fysisk komponent i datorns moderkort",
-          "Ett programpaket som enbart hanterar nätverkstrafik"
+          "Maskinkod består av instruktioner i ren text, medan källkod är krypterad",
+          "Källkod kan exekveras direkt av processorn, medan maskinkod måste tolkas via webbläsaren",
+          "Maskinkod består uteslutande av binära bitar (0 och 1) som CPU:n kör, medan källkod är skriven för människor och måste översättas",
+          "Maskinkod används enbart vid nätverksöverföring, medan källkod styr datorns arbetsminne"
         ],
-        answer: 1,
-        explanation: "Ett programmeringsspråk används av människor för att ge strukturerade instruktioner till en dator."
+        answer: 2,
+        explanation: "Datorns hårdvara (CPU) förstår enbart maskinkod (ettor och nollor). All källkod måste översättas dit."
       },
       {
         category: "Dataenheter",
-        question: "Hur många bitar (b) ingår det i 1 Byte (B)?",
+        question: "Hur många bitar (b) krävs det för att lagra 4 Bytes (B)?",
         options: [
-          "4 bitar",
-          "8 bitar",
           "16 bitar",
-          "1 024 bitar"
+          "32 bitar",
+          "64 bitar",
+          "4 096 bitar"
         ],
         answer: 1,
-        explanation: "1 Byte består alltid av exakt 8 bitar. En bit är det minsta värdet (0 eller 1)."
+        explanation: "Eftersom 1 Byte = 8 bitar, ger 4 Bytes: 4 * 8 = 32 bitar."
       },
       {
         category: "Dataenheter",
-        question: "Hur många Kilobytes (KB) motsvarar 1 Megabyte (MB)?",
+        question: "Varför motsvarar 1 Megabyte (MB) exakt 1 024 Kilobytes (KB) och inte 1 000 KB inom datavetenskap?",
         options: [
-          "100 KB",
-          "1 000 KB",
-          "1 024 KB",
-          "1 048 576 KB"
+          "Det är baserat på standardiserade ISO-regler för nätverkshastigheter",
+          "Datorns minnesadresser är uppbyggda kring det binära talsystemet (2¹⁰ = 1 024)",
+          "1 024 är den maximala mängd data som ryms i processorns L1-cache",
+          "Det beror på en felberäkning i tidiga IBM-datorer som behållits som standard"
         ],
-        answer: 2,
-        explanation: "I binära databeräkningar är 1 MB = 1 024 KB (och 1 GB = 1 024 MB)."
-      },
-      {
-        category: "Maskinkod",
-        question: "Vad kallas datorns eget grundspråk som datorns hårdvara (CPU) kan förstå och exekvera direkt?",
-        options: [
-          "Python-skript",
-          "Källkod i C++",
-          "Maskinkod (bestående av ettor och nollor)",
-          "Assembler mnemonics"
-        ],
-        answer: 2,
-        explanation: "En dator kan i grunden endast förstå och köra maskinkod bestående av binära sekvenser (nollor och ettor)."
+        answer: 1,
+        explanation: "Datorer räknar i potenser av 2. 2 upphöjt till 10 är precis 1 024, vilket utgör basen för KB, MB och GB."
       },
       {
         category: "Assemblerspråk",
-        question: "Vad kallas de korta textorden som används i assemblerspråk (som LOAD A, ADD B, MOV C)?",
+        question: "Vad kallas de symboliska textinstruktionerna som LOAD, ADD och MOV i assemblerspråk?",
         options: [
-          "Operativsystemskärnor",
+          "Direktiv",
           "Mnemoniska symboler",
-          "Standardmoduler",
-          "Kompileringsklasser"
+          "Bytekoder",
+          "Pseudokoder"
         ],
         answer: 1,
-        explanation: "Assembler använder mnemoniska symboler för att ersätta svårlästa binära sifferkoder med textkommandon som LOAD, ADD och MOV."
+        explanation: "De korta textorden kallas mnemoniska symboler (mnemonics) för att de ska vara lätta att komma ihåg för människor."
       },
       {
         category: "Assemblerspråk",
-        question: "Hur körs källkod skriven i ett assembleringsspråk?",
+        question: "Vilket program ansvarar för att översätta assembleringsspråk till maskinkod?",
         options: [
-          "Den tolkas direkt av bildskärmens drivrutin",
-          "Den översätts till maskinkod av ett speciellt översättningsprogram som kallas assemblator (assembler)",
-          "Den körs utan översättning direkt i CPU:n",
-          "Den konverteras till ett Word-dokument"
+          "En kommandotolk",
+          "En länkare (linker)",
+          "En assemblator (assembler)",
+          "En interpretator"
         ],
-        answer: 1,
-        explanation: "Ordningen är: Assembleringsspråk ➔ Assemblator (assembler) ➔ Maskinkod."
+        answer: 2,
+        explanation: "Det specifika översättningsprogrammet för assembler kallas en assemblator (på engelska assembler)."
       },
       {
         category: "Datorhistoria",
-        question: "Hur programmerades den tidiga datorn ENIAC (1946) innan assembleringsspråk fanns?",
+        question: "Hur matades instruktioner in i tidiga datorer som ENIAC (1946) innan assembleringsspråk uppfanns?",
         options: [
-          "Med enkla textfiler via diskett",
-          "Manuellt genom att ställa in ett antal knappar, strömbrytare och kablar för hand",
-          "Med röststyrda kommandon",
-          "Genom förskrivna Python-bibliotek"
+          "Genom manuell koppling av kablar och mekaniska strömbrytare på maskinen",
+          "Genom magnetband som lästes in med optiska sensorer",
+          "Genom att kompilera enkla textkommandon via hålkort",
+          "Genom ett förinstallerat BIOS på disketter"
         ],
-        answer: 1,
-        explanation: "ENIAC (som tog upp cirka 130 kvm) programmerades manuellt med switchar och sladdar innan assemblerspråk utvecklades."
+        answer: 0,
+        explanation: "På ENIAC fanns inga lagrade program; programmerarna ändrade datorns logik fysiskt med sladdar och brytare."
       },
       {
         category: "Högnivåspråk",
-        question: "Vad kännetecknar ett högnivåspråk (såsom Python, Java eller C#)?",
+        question: "Vad kännetecknar ett 'högnivåspråk' jämfört med ett lågnivåspråk?",
         options: [
-          "Det skrivs i en sorts 'halvengelska' som är mer anpassat till människors sätt att tänka",
-          "Det består enbart av kretskortslödningar",
-          "Det kan köras direkt i hårdvaran utan någon översättare",
-          "Det kan enbart användas för spelgrafik"
-        ],
-        answer: 0,
-        explanation: "Högnivåspråk liknar mänskligt språk (ofta engelska) och gör koden mycket lättare för människor att läsa och underhålla."
-      },
-      {
-        category: "Kompilator vs Interpretator",
-        question: "Vad gör en kompilator (Compiler)?",
-        options: [
-          "Den läser och kör koden rad för rad under tiden programmet är igång",
-          "Den tar hela källkoden och översätter den i förväg till en fristående körbar fil (t.ex. .exe)",
-          "Den kontrollerar endast stavningen i kommentarer",
-          "Den formaterar bildskärmsupplösningen"
+          "Det körs snabbare i hårdvaran eftersom det inte kräver översättning",
+          "Det är abstraherat från maskinens hårdvaruarkitektur och liknar mänskligt språk",
+          "Det tillåter endast numeriska beräkningar och saknar stöd för textsträngar",
+          "Det kräver att utvecklaren manuellt anger minnesregister för varje variabel"
         ],
         answer: 1,
-        explanation: "Kompilatorn analyserar hela projektet i förväg och skapar en färdig maskinkodsfil (.exe) innan körning."
+        explanation: "Högnivåspråk (t.ex. Python) abstraherar bort register och CPU-specifika detaljer till förmån för mänsklig läsbarhet."
       },
       {
         category: "Kompilator vs Interpretator",
-        question: "Hur fungerar en interpretator (Interpreter)?",
+        question: "Vilket påstående beskriver bäst hur en kompilator fungerar?",
         options: [
-          "Den fungerar som en tolk som läser och översätter koden rad för rad i minnet under tiden den körs",
-          "Den bygger alltid en fristående .exe-fil innan start",
-          "Den kontrollerar hela projektet innan en enda rad får köras",
-          "Den används enbart vid hårdvarutillverkning"
-        ],
-        answer: 0,
-        explanation: "Interpretatorn översätter kontinuerligt i realtid rad för rad, utan att spara en färdig .exe-fil."
-      },
-      {
-        category: "Kompilator vs Interpretator",
-        question: "Vad händer om en interpretator stöter på ett fel längre ner i källkoden?",
-        options: [
-          "Programmet vägrar starta alls",
-          "Programmet startar och kör alla rader fram till felet och stannar tvärt där",
-          "Felet rättas automatiskt i tysthet",
-          "Datorn startar om"
+          "Den översätter och exekverar koden rad för rad direkt i datorns arbetsminne",
+          "Den analyserar hela källkoden i förväg och skapar en fristående körbar fil (.exe)",
+          "Den körs uteslutande inuti webbläsaren för att visa dynamisk HTML",
+          "Den rättar logiska buggar automatiskt under programkörning"
         ],
         answer: 1,
-        explanation: "Eftersom interpretatorn tolkar i stunden kör den allt felfritt fram till den rad där felet uppstår, varpå den avbryter."
+        explanation: "En kompilator gör en total översättning av källkoden till maskinkod i förväg och genererar en körbar fil."
+      },
+      {
+        category: "Kompilator vs Interpretator",
+        question: "Vad händer när ett program som körs med en interpretator har ett syntaxfel på rad 15?",
+        options: [
+          "Programmet vägrar starta och felmeddelandet visas omedelbart innan rad 1 körs",
+          "Interpretatorn hoppar över rad 15 och slutför resten av skriptet",
+          "Rad 1 till 14 utförs felfritt, men programmet avbryts tvärt när det når rad 15",
+          "Hela källkodsfilen raderas ur projektmappen"
+        ],
+        answer: 2,
+        explanation: "Eftersom interpretatorn tolkar rad för rad i stunden körs all kod fram till den rad där felet uppstår, där den kraschar."
+      },
+      {
+        category: "Kompilator vs Interpretator",
+        question: "Varför tenderar ett kompilerat program i C eller C++ att köra snabbare än samma program i Python?",
+        options: [
+          "C++ använder alltid mindre minne på hårddisken än Python",
+          "C++ källkod hoppar över CPU-klockcykler",
+          "Det kompilerade programmet finns redan i direkt exekverbar maskinkod utan tolk i realtid",
+          "Interpretatorer tillåter inte matematiska beräkningar i processorns flyttalsenhet"
+        ],
+        answer: 2,
+        explanation: "Kompilerad kod körs direkt av processorn utan en tolk som måste läsa, analysera och exekvera rad för rad under drift."
+      },
+      {
+        category: "Språkklassificering",
+        question: "Vilket av följande språk är primärt kompilerat till maskinkod i stället för tolkat?",
+        options: [
+          "Python",
+          "JavaScript",
+          "C++",
+          "Ruby"
+        ],
+        answer: 2,
+        explanation: "C++ kompileras direkt till maskinkod i förväg, medan Python, JavaScript och Ruby tolkas vid körning."
       },
       {
         category: "Felsökning",
-        question: "Vad innebär termen 'Debugging' (avlusning)?",
+        question: "Vad är skillnaden mellan ett 'syntaxfel' och en 'logisk bugg' vid debugging?",
         options: [
-          "Att installera ett nytt antivirusprogram",
-          "Processen att hitta, analysera och åtgärda fel och buggar i ett program",
-          "Att komprimera en fil till zip-format",
-          "Att översätta kod till ett annat högnivåspråk"
+          "Syntaxfel kraschar kompilatorn/tolken för att kodreglerna bröts; logiska fel gör att koden körs men ger fel resultat",
+          "Syntaxfel beror alltid på felaktig hårdvara; logiska buggar beror på fel i operativsystemet",
+          "Syntaxfel uppstår bara i Python; logiska fel uppstår bara i kompilerade språk",
+          "Det finns ingen skillnad, båda termerna avser exakt samma typ av felmeddelande"
         ],
-        answer: 1,
-        explanation: "Debugging är den metodiska processen att lokalisera och fixa felaktigheter (buggar) i koden."
+        answer: 0,
+        explanation: "Ett syntaxfel bryter mot grammatiken så koden inte kan tolkas. Ett logiskt fel gör fel beräkningar fast koden är 'korrekt' skriven."
       },
       {
         category: "Python fakta",
-        question: "Vem lanserade programspråket Python år 1991, och vad har filerna för filändelse?",
+        question: "Vilket år lanserades Python officiellt av Guido van Rossum?",
         options: [
-          "Dennis Ritchie (.c)",
-          "Guido van Rossum (.py)",
-          "Bjarne Stroustrup (.cpp)",
-          "James Gosling (.java)"
+          "1985",
+          "1991",
+          "1996",
+          "2001"
         ],
         answer: 1,
-        explanation: "Python lanserades av Guido van Rossum 1991 och sparade filer har alltid ändelsen .py."
+        explanation: "Python skapades i slutet av 1980-talet och släpptes officiellt första gången år 1991."
       },
       {
-        category: "Kursbok & Resurser",
-        question: "Vilken lärobok används i kursen enligt lektionsmaterialet?",
+        category: "Kurslitteratur",
+        question: "Vem är författaren till kursboken 'Python från början' som används i kursen?",
         options: [
-          "C++ Direkt av Jan Skansholm",
-          "Python från början av Jan Skansholm",
-          "Automate the Boring Stuff with Python av Al Sweigart",
-          "Lär dig Linux på 3 veckor"
+          "Bjarne Stroustrup",
+          "Jan Skansholm",
+          "Guido van Rossum",
+          "Pierre Gergi"
         ],
         answer: 1,
-        explanation: "Kursboken är 'Python från början' författad av Jan Skansholm (ISBN 9789144134932)."
+        explanation: "Läroboken 'Python från början' är skriven av Jan Skansholm (Studentlitteratur)."
       },
       {
-        category: "Installation & System",
-        question: "På vilka operativsystem är chansen stor att Python redan finns förinstallerat?",
+        category: "Installation & Miljö",
+        question: "Vad stämmer angående Python-installation på Mac och Linux enligt genomgången?",
         options: [
-          "Windows XP och MS-DOS",
-          "Mac och Linux",
-          "PlayStation 5",
-          "iOS"
+          "Python kan inte installeras på dessa system utan emulator",
+          "Systemen har ofta en Python-interpretator förinstallerad från start",
+          "Man måste alltid kompilera Python från källkod manuellt",
+          "De kräver alltid betallicens för att köra Python-skript"
         ],
         answer: 1,
-        explanation: "På Mac- och Linux-datorer är Python mycket ofta förinstallerat direkt från start i operativsystemet."
+        explanation: "Mac och Linux har historiskt och praktiskt oftast en Python-miljö färdiginstallerad i operativsystemet."
       },
       {
         category: "Webbverktyg",
-        question: "Vilken gratissida nämns i presentationen för att köra Python online med stöd för över 60 språk?",
+        question: "Vilken funktion fyller online-verktyget OneCompiler?",
         options: [
-          "OneCompiler (www.onecompiler.com)",
-          "Notepad++ Online",
-          "PyCharm Cloud",
-          "Sublime Web"
-        ],
-        answer: 0,
-        explanation: "OneCompiler stödjer över 60 språk och databaser och låter användaren skriva, köra och dela kod direkt."
-      },
-      {
-        category: "Officiell nedladdning",
-        question: "Vad innehåller standardpaketet som man laddar ner från www.python.org?",
-        options: [
-          "Endast en textfil med instruktioner",
-          "Både själva Python-interpretatorn och Pythons standardbibliotek med moduler",
-          "Ett komplett antivirusprogram",
-          "Enbart Visual Studio Code"
+          "Det formaterar om Python-filer till PDF-rapporter",
+          "Det är en webbtjänst för att skriva, köra och dela kod i över 60 språk direkt i webbläsaren",
+          "Det är ett installationsprogram som ersätter Visual Studio Code",
+          "Det kontrollerar om datorn har virus innan Python installeras"
         ],
         answer: 1,
-        explanation: "Distributionen från python.org innehåller själva motorn (interpretatorn) plus alla inbyggda moduler i standardbiblioteket."
+        explanation: "OneCompiler låter användare köra källkod i över 60 olika språk direkt i molnet utan att installera något lokalt."
       },
       {
         category: "VS Code Setup",
-        question: "Vad behöver du göra inuti VS Code efter installation för att kunna koda Python smidigt?",
+        question: "Varför behöver man installera det officiella 'Python Extension' i VS Code?",
         options: [
-          "Köpa en betallicens via Microsoft Store",
-          "Installera Python-tillägget (Python Extension) via tilläggsmenyn",
-          "Kompilera om editorns källkod",
-          "Stänga av brandväggen"
-        ],
-        answer: 1,
-        explanation: "Man öppnar extensions-fliken till vänster i VS Code, söker på 'Python' och klickar på Installera."
-      },
-      {
-        category: "VS Code Kortkommando",
-        question: "Vilket snabbkommando öppnar kommandopaletten (Command Palette) i VS Code?",
-        options: [
-          "Ctrl + Shift + P",
-          "Ctrl + Alt + Del",
-          "Ctrl + Z",
-          "Alt + F4"
+          "För att VS Code i grunden bara är en generell textredigerare utan inbyggt språkstöd för att köra och felsöka Python",
+          "För att aktivera licensen för Windows",
+          "För att datorn ska kunna ansluta till internet",
+          "För att kunna använda vanliga tangenter som enter och backsteg"
         ],
         answer: 0,
-        explanation: "Ctrl + Shift + P (eller F1) öppnar kommandopaletten där man når alla VS Code-kommandon."
+        explanation: "VS Code är en modulär editor; Python-tillägget lägger till syntaxfärgning, körknapp, linting och felsökare för just Python."
       },
       {
-        category: "VS Code Kortkommando",
-        question: "Vilket kortkommando öppnar filsnabbsökaren (Quick Open) för att snabbt hitta filer i VS Code?",
+        category: "VS Code Genvägar",
+        question: "Vad är skillnaden i funktion mellan kortkommandot Ctrl + P och Ctrl + Shift + P i VS Code?",
         options: [
-          "Ctrl + P",
-          "Ctrl + Shift + S",
-          "Ctrl + Tab",
-          "Alt + P"
-        ],
-        answer: 0,
-        explanation: "Ctrl + P öppnar snabbsökaren för filer."
-      },
-      {
-        category: "VS Code Kortkommando",
-        question: "Hur flyttar du en markerad kodrad uppåt eller nedåt utan att klippa och klistra?",
-        options: [
-          "Ctrl + Shift + Up/Down",
-          "Alt + Arrow Up / Arrow Down",
-          "Ctrl + C följt av Ctrl + V",
-          "Tab + Mellanslag"
+          "Ctrl + P skriver ut dokumentet på skrivare; Ctrl + Shift + P sparar projektet",
+          "Ctrl + P söker snabbt fram filer; Ctrl + Shift + P öppnar kommandopaletten för editorfunktioner",
+          "Ctrl + P startar programmet; Ctrl + Shift + P pausar debuggern",
+          "Båda kommandona gör exakt samma sak"
         ],
         answer: 1,
-        explanation: "Alt + Pil upp/ner flyttar raden dit markören pekar direkt uppåt eller nedåt i filen."
+        explanation: "Ctrl + P är 'Quick Open' för filnamn. Lägger man till Shift öppnas Command Palette där man kan söka efter kommandon."
       },
       {
-        category: "VS Code Kortkommando",
-        question: "Vilket snabbkommando startar autokomplettering (IntelliSense/kodförslag) i VS Code?",
+        category: "VS Code Genvägar",
+        question: "Vilket kortkommando används för att flytta en hel kodrad uppåt eller nedåt i VS Code?",
         options: [
-          "Ctrl + Space",
-          "Shift + Enter",
-          "Alt + K",
-          "F5"
-        ],
-        answer: 0,
-        explanation: "Ctrl + Space öppnar menyn med automatiska förslag och kompletteringar för kodord."
-      },
-      {
-        category: "VS Code Kortkommando",
-        question: "Hur sätter du ut multipla markörer för att redigera på flera rader samtidigt i VS Code?",
-        options: [
-          "Dubbelklicka med mellanslag",
-          "Alt + Klick (eller Option + Click på Mac)",
-          "Hålla inne Shift + Delete",
-          "Högerklicka fem gånger"
+          "Ctrl + Arrow Up / Down",
+          "Alt + Arrow Up / Down",
+          "Shift + Arrow Up / Down",
+          "Ctrl + Shift + Arrow Up / Down"
         ],
         answer: 1,
-        explanation: "Genom att hålla inne Alt och klicka på flera ställen får du multipla markörer och kan skriva samtidigt på flera rader."
+        explanation: "Alt + Pil upp/ner flyttar raden. (Ctrl + Shift + Pil kopierar raden uppåt/nedåt i stället)."
       },
       {
-        category: "VS Code Kortkommando",
-        question: "Vilket kortkommando öppnar snabbfix-menyn (Quick Fix) för att snabbt åtgärda varningar eller fel i koden?",
+        category: "VS Code Genvägar",
+        question: "Vilket kortkommando öppnar snabbfix-menyn (Quick Fix) för att snabbt korrigera ett markerat kodproblem?",
         options: [
           "Ctrl + . (punkt)",
-          "Ctrl + Shift + F12",
-          "Alt + Backspace",
-          "Ctrl + End"
+          "Ctrl + , (komma)",
+          "Ctrl + Space",
+          "F12"
         ],
         answer: 0,
-        explanation: "Ctrl + . (punkt) öppnar snabbfix-menyn för att rätta fel eller importera moduler som saknas."
-      },
-      {
-        category: "VS Code Kortkommando",
-        question: "Vilken tangent trycker du på för att gå direkt till definitionen av en markerad variabel eller funktion?",
-        options: [
-          "F12",
-          "F5",
-          "F1",
-          "Esc"
-        ],
-        answer: 0,
-        explanation: "F12 hoppar direkt till den plats där funktionen eller variabeln skapades/definierades."
+        explanation: "Ctrl + . (punkt) öppnar Quick Fix med förslag på lösningar. (Ctrl + komma öppnar inställningarna; Ctrl + Space öppnar autokomplettering)."
       }
     ];
 
@@ -412,7 +352,6 @@
     let score = 0;
     let answered = false;
 
-    // DOM Elements
     const questionText = document.getElementById("question-text");
     const optionsContainer = document.getElementById("options-container");
     const explanationBox = document.getElementById("explanation-box");
