@@ -1,672 +1,471 @@
 <!DOCTYPE html>
-<html lang="sv" class="h-full">
+<html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Programmering Lektion 1 - Det Kompletta Quizet</title>
-  <!-- Tailwind CSS CDN -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz – Programmering Nivå 1</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-          }
-        }
-      }
-    };
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: rgba(148, 163, 184, 0.4);
-      border-radius: 9999px;
+    code, .mono {
+      font-family: 'JetBrains Mono', monospace;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-full flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
 
-  <header class="w-full border-b border-slate-800 bg-slate-900/70 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/25">
-          &lt;/&gt;
-        </div>
-        <div>
-          <h1 class="text-base font-bold text-white tracking-tight">Programmering Lektion 1</h1>
-          <p class="text-xs text-slate-400">Komplett studiequiz & begrepp</p>
-        </div>
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></span>
+        <h1 class="text-lg font-bold tracking-tight text-white">Programmering Nivå 1</h1>
       </div>
-      
-      <div class="flex items-center space-x-3 text-xs">
-        <label class="flex items-center cursor-pointer select-none bg-slate-800/80 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700/60 text-slate-300">
-          <input type="checkbox" id="shuffleToggle" class="mr-2 accent-indigo-500 rounded">
-          Slumpa frågor
-        </label>
-        <span id="scoreTracker" class="bg-indigo-950/80 border border-indigo-700/50 text-indigo-300 font-semibold px-2.5 py-1.5 rounded-lg">
-          Poäng: 0
-        </span>
+      <div id="stat-pill" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+        Fråga <span id="current-index" class="text-cyan-400">1</span> / <span id="total-count">0</span>
       </div>
     </div>
   </header>
 
-  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 flex flex-col items-center justify-center">
-
-    <!-- Quiz-kortet -->
-    <div id="quizCard" class="w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 relative overflow-hidden transition-all duration-300">
+  <!-- Main Container -->
+  <main class="flex-grow flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl shadow-cyan-950/20 relative overflow-hidden">
       
       <!-- Progress Bar -->
-      <div class="mb-6">
-        <div class="flex justify-between items-center text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-          <span id="questionCountText">Fråga 1 av 20</span>
-          <span id="percentText">5%</span>
-        </div>
-        <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/40">
-          <div id="progressFill" class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-300 ease-out" style="width: 5%;"></div>
-        </div>
+      <div class="w-full bg-slate-800 h-2 rounded-full mb-8 overflow-hidden">
+        <div id="progress" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-0 transition-all duration-300 ease-out"></div>
       </div>
 
-      <!-- Frågetext -->
-      <div class="mb-6">
-        <span id="categoryBadge" class="inline-block text-[11px] font-semibold text-indigo-400 bg-indigo-950/70 border border-indigo-800/60 px-2.5 py-0.5 rounded-full mb-2 uppercase tracking-wide">
-          Grundbegrepp
-        </span>
-        <h2 id="questionHeading" class="text-xl sm:text-2xl font-bold text-white leading-snug tracking-tight">
-          Laddar fråga...
+      <!-- Quiz Screen -->
+      <div id="quiz-screen">
+        <div class="flex items-center justify-between mb-4">
+          <span id="question-category" class="text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-950/60 border border-cyan-800/50 px-2.5 py-1 rounded-md">Begrepp</span>
+          <span id="score-counter" class="text-xs font-medium text-slate-400">Poäng: <strong id="score" class="text-slate-200">0</strong></span>
+        </div>
+
+        <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-white mb-6 leading-relaxed">
+          Frågan laddas...
         </h2>
-      </div>
 
-      <!-- Svarsalternativ -->
-      <div id="optionsContainer" class="grid grid-cols-1 gap-3">
-        <!-- Alternativen ritas ut här -->
-      </div>
+        <!-- Options Container -->
+        <div id="options-container" class="space-y-3 mb-6"></div>
 
-      <!-- Pedagogisk Förklaring / Feedback -->
-      <div id="feedbackContainer" class="hidden mt-6 p-4 rounded-xl border transition-all duration-200">
-        <div class="flex items-start space-x-3">
-          <div id="feedbackIcon" class="text-lg mt-0.5"></div>
-          <div>
-            <div id="feedbackStatus" class="font-bold text-sm tracking-wide mb-1"></div>
-            <p id="feedbackText" class="text-sm text-slate-300 leading-relaxed"></p>
+        <!-- Explanation Card -->
+        <div id="explanation-box" class="hidden rounded-2xl p-4 sm:p-5 border transition-all duration-200 mb-6">
+          <div class="flex items-start gap-3">
+            <span id="explanation-icon" class="text-xl leading-none mt-0.5">💡</span>
+            <div>
+              <p id="explanation-title" class="font-bold text-sm mb-1"></p>
+              <p id="explanation-text" class="text-sm leading-relaxed text-slate-300"></p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Navigationsknapp -->
-      <div class="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-        <button id="resetQuickBtn" class="text-xs text-slate-400 hover:text-slate-200 underline underline-offset-4">
-          Börja om från början
-        </button>
-        <button id="nextQuestionBtn" class="hidden px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center space-x-2">
-          <span id="nextBtnText">Nästa fråga</span>
-          <span>&rarr;</span>
+        <!-- Next Button -->
+        <button id="next-btn" class="hidden w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-lg shadow-cyan-500/25 active:scale-[0.99] flex items-center justify-center gap-2">
+          <span>Nästa fråga</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </button>
       </div>
-    </div>
 
-    <div id="resultCard" class="hidden w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 transition-all">
-      <div class="text-center max-w-md mx-auto">
-        <div id="resultBadge" class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-extrabold shadow-inner mb-4">
+      <!-- Result Screen -->
+      <div id="result-screen" class="hidden text-center py-4">
+        <div id="result-badge" class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-4xl mb-6">
           🏆
         </div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Quizet är Slutfört!</h2>
-        <p id="resultComment" class="text-slate-400 text-sm mb-6">Här är ditt slutresultat.</p>
+        <h2 class="text-3xl font-extrabold text-white mb-2">Quizet är klart!</h2>
+        <p class="text-slate-400 mb-6 text-sm">Här är en sammanställning av dina kunskaper i Programmering nivå 1.</p>
 
-        <!-- Poängcirkel / Resultatruta -->
-        <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 mb-6">
-          <div class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-300 mb-1" id="finalScoreVal">
-            0 / 20
+        <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-8">
+          <div class="bg-slate-850 p-4 rounded-2xl border border-slate-800">
+            <span class="block text-2xl font-black text-cyan-400" id="final-score">0</span>
+            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Antal rätt</span>
           </div>
-          <div class="text-xs uppercase tracking-wider font-semibold text-slate-500" id="finalPercentVal">
-            0% Rätt svar
+          <div class="bg-slate-850 p-4 rounded-2xl border border-slate-800">
+            <span class="block text-2xl font-black text-cyan-400" id="final-percentage">0%</span>
+            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Träffsäkerhet</span>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-3 justify-center mb-8">
-          <button id="restartBtn" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all text-sm">
-            Gör quizet igen
-          </button>
-          <a href="#answersReview" class="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 transition-all text-sm flex items-center justify-center">
-            Granska dina svar &darr;
-          </a>
-        </div>
+        <p id="grade-comment" class="text-base text-slate-200 font-semibold mb-8 max-w-md mx-auto"></p>
+
+        <button id="restart-btn" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-lg shadow-cyan-500/25">
+          Starta om quizet
+        </button>
       </div>
 
-      <!-- Svarsöversikt -->
-      <div id="answersReview" class="border-t border-slate-800 pt-8 mt-6">
-        <h3 class="text-lg font-bold text-white mb-4 flex items-center space-x-2">
-          <span>Detaljerad genomgång</span>
-          <span class="text-xs font-normal text-slate-400">(Facit & dina svar)</span>
-        </h3>
-        <div id="reviewList" class="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-          <!-- Genereras dynamiskt via JS -->
-        </div>
-      </div>
     </div>
   </main>
 
-  <footer class="w-full border-t border-slate-900 bg-slate-950/60 py-4 text-center text-xs text-slate-500">
-    Programmering lektion 1 • Skapat för GitHub Pages
+  <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900">
+    Programmering Nivå 1 • Självstudier & Quiz
   </footer>
 
   <script>
-    const questionsBank = [
+    const quizData = [
       {
-        id: 1,
-        category: "Programspråk",
-        question: "Vad är ett programspråk?",
+        category: "Grundbegrepp",
+        question: "Vad är ett programspråk i grunden?",
         options: [
-          "Ett språk som används för att bygga datorns fysiska hårdvara.",
-          "Ett språk som man använder för att ge instruktioner till en dator så att den gör det man vill.",
-          "Ett hemligt chiffer som bara webbläsare kan tyda.",
-          "Ett digitalt lexikon som översätter engelska till svenska automatiskt."
+          "Ett operativsystem som styr datorns processor och minne",
+          "Ett formellt språk som människor använder för att ge instruktioner och skapa mjukvara till en dator",
+          "En datorkomponent som översätter hårdvara till grafik",
+          "En typ av textfil som bara kan köras inuti en webbläsare"
         ],
         answer: 1,
-        explanation: "Ett programspråk är just ett verktyg för att förmedla kommandon och instruktioner till en dator."
+        explanation: "Ett programspråk är ett formellt, strukturerat språk för instruktioner till en dator. Det översätts sedan till maskinkod (ettor och nollor)."
       },
       {
-        id: 2,
-        category: "Programspråk",
-        question: "Vad händer när man skriver kommandon i ett programspråk?",
+        category: "Dataenheter",
+        question: "Hur många bitar (b) ingår det i 1 Byte (B)?",
         options: [
-          "Datorn stänger alltid ner programmet för att spara energi.",
-          "Datorn ignorerar dem tills man startar om strömförsörjningen.",
-          "Datorn läser dem och utför uppgiften som angetts.",
-          "Datorn ritar automatiskt upp en webbsida på skärmen."
+          "4 bitar",
+          "8 bitar",
+          "16 bitar",
+          "1 024 bitar"
+        ],
+        answer: 1,
+        explanation: "1 Byte består exakt av 8 bitar. Minsta värdet är en bit (0 eller 1)."
+      },
+      {
+        category: "Dataenheter",
+        question: "Hur många Kilobytes (KB) motsvarar 1 Megabyte (MB)?",
+        options: [
+          "100 KB",
+          "1 000 KB",
+          "1 024 KB",
+          "1 048 576 KB"
         ],
         answer: 2,
-        explanation: "Man skriver kommandon i programspråket, och datorn läser instruktionerna och utför den önskade uppgiften."
+        explanation: "I datavärlden används tvåpotenser där 1 MB = 1 024 KB, och 1 KB = 1 024 Bytes."
       },
       {
-        id: 3,
-        category: "Webbutveckling",
-        question: "Vad är JavaScript och vad används det främst till?",
+        category: "Maskinkod & CPU",
+        question: "Vilken är den enda form av kod som en dators processor (CPU) faktiskt kan avkoda och köra direkt?",
         options: [
-          "Ett program för att redigera och spara bildfiler.",
-          "Ett programspråk som gör webbsidor interaktiva, till exempel med knappar, menyer och animationer.",
-          "Datorns inbyggda maskinspråk som består av rena ettor och nollor.",
-          "Ett operativsystem som styr serverhårdvara."
-        ],
-        answer: 1,
-        explanation: "JavaScript är webbens dynamiska programspråk och ger liv åt webbsidor genom klickbara knappar, menyer och rörliga element."
-      },
-      {
-        id: 4,
-        category: "Datorprogram",
-        question: "Vad är ett datorprogram?",
-        options: [
-          "Ett program eller en app som datorn kör för att utföra en viss uppgift (t.ex. Word eller ett spel).",
-          "Datorns moderkort och tillhörande elkablar.",
-          "Ett batteri som lagrar koden när datorn är avstängd.",
-          "Endast den kod som körs på en webbserver utan skärm."
-        ],
-        answer: 0,
-        explanation: "Ett datorprogram är en applikation eller mjukvara som körs för att åstadkomma något specifikt, från textbehandlare till datorspel."
-      },
-      {
-        id: 5,
-        category: "Assemblerspråk",
-        question: "Vad kännetecknar assemblerspråk?",
-        options: [
-          "Det är ett modernt bildhanteringsprogram skapat för grafiker.",
-          "Det är ett språk som liknar vanligt talspråk och är busenkelt för alla människor att läsa.",
-          "Det är ett väldigt enkelt programspråk som ligger nära datorns maskinspråk och använder korta instruktioner.",
-          "Det är ett programmeringsspråk som endast används för internetkablar."
+          "Python-skript",
+          "C++ källkod",
+          "Maskinkod (binär form med ettor och nollor)",
+          "Assembler-symboler"
         ],
         answer: 2,
-        explanation: "Assembler är ett avskalat lågnivåspråk med korta instruktioner med minimal abstraktion från hårdvaran."
+        explanation: "En dator kan i grund och botten inte köra någonting annat än ren maskinkod (sekvenser av ettor och nollor)."
       },
       {
-        id: 6,
         category: "Assemblerspråk",
-        question: "Varför upplevs assemblerspråk som svårt för människor?",
+        question: "Vad kallas de läsbara textorden som används i assemblerspråk (som LOAD, ADD, MOV)?",
         options: [
-          "Datorn förstår det nästan direkt, men språket är mycket primitivt och svårt för människor att skriva och överblicka.",
-          "Datorn vägrar att läsa assemblerspråk om man inte betalar en dyr licens.",
-          "Det kräver att man talar engelska helt flytande i en mikrofon.",
-          "Man måste alltid rita instruktionerna som figurer istället för text."
-        ],
-        answer: 0,
-        explanation: "Datorn har lätt att förstå det eftersom det ligger nära maskinspråk, men för människor är de extremt detaljerade instruktionerna svårskrivna."
-      },
-      {
-        id: 7,
-        category: "Assemblerspråk",
-        question: "Vart skickar assemblerspråk sina enkla instruktioner?",
-        options: [
-          "Direkt till datorskärmens glaspanel.",
-          "Direkt till datorns processor (CPU).",
-          "Till internetleverantören.",
-          "Till datormusens sensor."
+          "Funktionsparametrar",
+          "Mnemoniska symboler",
+          "Syntaxregler",
+          "Binära variabler"
         ],
         answer: 1,
-        explanation: "Assemblerspråk skickar mycket enkla och direkta instruktioner direkt till processorn för omedelbar bearbetning."
+        explanation: "Assembler använder mnemoniska (minnesvänliga) symboler som instruktioner istället för råa binära siffersekvenser."
       },
       {
-        id: 8,
-        category: "Språknivåer",
-        question: "Vilken typ av språknivå tillhör assemblerspråk?",
+        category: "Assemblerspråk",
+        question: "Hur körs ett program skrivet i assemblerspråk?",
         options: [
-          "Ett högnivåspråk.",
-          "Ett designspråk.",
-          "Ett lågnivåspråk som ligger nära maskinspråk.",
-          "Ett mänskligt modersmål."
+          "Det tolkas rad för rad i webbläsaren",
+          "Processorn förstår källkoden helt direkt utan översättning",
+          "Det översätts till maskinkod av ett särskilt program som kallas assemblator",
+          "Det packas om till ett Python-paket"
         ],
         answer: 2,
-        explanation: "Assemblerspråk kallas för lågnivåspråk eftersom det ligger mycket nära datorns faktiska maskinspråk."
+        explanation: "Ordningen är: Assemblerspråk ➔ Assemblator (assembler) ➔ Maskinkod."
       },
       {
-        id: 9,
-        category: "Högnivåspråk",
-        question: "Vad är ett högnivåspråk?",
+        category: "Datorhistoria",
+        question: "Hur programmerades den tidiga datorn ENIAC (1946) innan assembler fanns?",
         options: [
-          "Ett språk som bara kan användas om datorn är ansluten till en satellit.",
-          "Ett programspråk som är lättare för människor att läsa och skriva.",
-          "Ett språk som endast består av siffrorna 0 och 1.",
-          "En hårdvara som kyler ner processorn under hög belastning."
+          "Med enkla textfiler på disketter",
+          "Helt manuellt via fysiska strömbrytare, knappar och kablar",
+          "Genom röstigenkänning och reläer",
+          "Med hålkort skrivna i Python"
         ],
         answer: 1,
-        explanation: "Högnivåspråk är designade för att vara begripliga för människor med ord, syntax och logik som är lätt att arbeta med."
+        explanation: "På ENIAC (som var ca 130 kvm stor) programmerade man manuellt med fysiska kopplingar, kablar och strömbrytare. Assembler uppfanns för att förenkla detta."
       },
       {
-        id: 10,
         category: "Högnivåspråk",
-        question: "Hur fungerar högnivåspråk i praktiken när datorn ska köra koden?",
+        question: "Vad kännetecknar ett högnivåspråk (som Python, Java eller C#)?",
         options: [
-          "Människan skriver med ord och regler som liknar vanligt språk, och sedan översätts det så datorn kan köra det som maskinspråk.",
-          "Datorns processor kan förstå engelska ord direkt utan någon översättning alls.",
-          "Datorn skriver om all kod till HTML innan den körs.",
-          "Ingen dator kan köra högnivåspråk; man måste alltid använda hålkort."
+          "Det styrs endast av fysiska kretsar och strömbrytare",
+          "Det är utformat för att vara lätt för människor att läsa och skriva och liknar engelska eller matematik",
+          "Det körs alltid utan att behöva översättas till maskinkod",
+          "Det kan bara användas för att bygga datorspel"
+        ],
+        answer: 1,
+        explanation: "Högnivåspråk prioriterar läsbarhet för människor och ligger nära engelska språket och matematisk logik."
+      },
+      {
+        category: "Kompilator vs Interpretator",
+        question: "Hur arbetar en kompilator (Compiler)?",
+        options: [
+          "Den läser och kör källkoden rad för rad under drift",
+          "Den läser igenom hela koden på en gång och skapar en fristående körbar binärfil (t.ex. en .exe-fil)",
+          "Den söker enbart efter kommentarer i källkoden",
+          "Den översätter koden till engelsk text för utvecklaren"
+        ],
+        answer: 1,
+        explanation: "En kompilator analyserar hela koden i förväg, kontrollerar syntaxfel och bygger en färdig körbar fil (.exe)."
+      },
+      {
+        category: "Kompilator vs Interpretator",
+        question: "Hur beter sig en interpretator (Interpreter) när den stöter på ett fel i koden?",
+        options: [
+          "Den vägrar starta programmet tills alla fel i hela projektet är åtgärdade",
+          "Den rättar automatiskt felet med hjälp av AI",
+          "Den kör programmet fram till felaktiga raden och kraschar/stannar tvärt där",
+          "Den ignorerar felet och hoppar över resten av programmet"
+        ],
+        answer: 2,
+        explanation: "Eftersom interpretatorn tolkar i realtid rad för rad körs all felfri kod tills den träffar på felet, varpå programmet avbryts med ett felmeddelande."
+      },
+      {
+        category: "Kompilator vs Interpretator",
+        question: "Vilken typ av program körs i regel snabbast under själva driften?",
+        options: [
+          "Kompilerade program, eftersom processorn får färdig maskinkod direkt utan en tolk emellan",
+          "Interpreterade program, eftersom de laddar en rad i taget i minnet",
+          "Bash- och PowerShell-skript",
+          "Program skrivna enbart i textredigerare"
         ],
         answer: 0,
-        explanation: "Eftersom processorn bara förstår maskinkod måste högnivåspråk översättas (via compiler eller interpreter) till maskinspråk."
+        explanation: "Kompilerade program körs snabbare eftersom all översättning redan är gjord i förväg till maskinkod."
       },
       {
-        id: 11,
-        category: "Högnivåspråk",
-        question: "Vilka av följande är typiska exempel på högnivåspråk enligt lektionen?",
+        category: "Språkexempel",
+        question: "Vilka av följande språk är typiska exempel på tolkade (interpreterade) språk?",
         options: [
-          "Maskinkod och Mikrochip",
-          "Python och JavaScript",
-          "Word och Excel",
-          "Processor och Hårddisk"
+          "C och C++",
+          "Python, JavaScript och Ruby",
+          "Assembler och Maskinkod",
+          "Go och Swift"
         ],
         answer: 1,
-        explanation: "Både Python och JavaScript är tydliga exempel på högnivåspråk som är lättlästa och populära för utvecklare."
+        explanation: "Python, JavaScript, Ruby samt kommandotolkar som Bash och PowerShell tolkas och körs via en interpretator."
       },
       {
-        id: 12,
-        category: "Instruktioner & Variabler",
-        question: "Vad innebär den enkla instruktionen 'ADD B'?",
-        options: [
-          "Datorn stänger av bokstaven B på tangentbordet.",
-          "Datorn lägger till (adderar) värdet som finns i variabeln B.",
-          "Datorn raderar variabeln B från hårddisken.",
-          "Datorn söker efter ordet B i alla filer."
-        ],
-        answer: 1,
-        explanation: "'ADD B' betyder att datorn tar värdet som för närvarande lagras i variabeln B och lägger till det."
-      },
-      {
-        id: 13,
-        category: "Variabler",
-        question: "Hur kan man likna en variabel vid en 'låda'?",
-        options: [
-          "Variabeln är en låda som sparar ett värde (t.ex. talet 5) och datorn hämtar värdet när det behövs.",
-          "Den är en trälåda där datorns sladdar förvaras för att inte trassla.",
-          "Den är en pappkartong som slängs så fort datorn stängs av.",
-          "Det är en begränsning som hindrar datorn från att räkna högre än 10."
-        ],
-        answer: 0,
-        explanation: "Liknelsen är att variabeln är en namngiven förvaringslåda som rymmer ett specifikt värde för framtida bruk."
-      },
-      {
-        id: 14,
-        category: "Variabler",
-        question: "Vad är en variabel mer tekniskt i en dator?",
-        options: [
-          "En lampa på datorns framsida som blinkar rött.",
-          "En namngiven plats i datorns minne där man sparar information (t.ex. ett tal eller ett namn).",
-          "Ett fysiskt verktyg man skruvar ihop datorer med.",
-          "En brandvägg som stoppar obehöriga datavirus."
-        ],
-        answer: 1,
-        explanation: "Tekniskt sett allokerar datorn en minnescell (adress i RAM-minnet) under variabelns namn för att hålla data."
-      },
-      {
-        id: 15,
-        category: "Exekvering",
-        question: "Hur arbetar en Interpreter (tolkare)?",
-        options: [
-          "Den översätter hela programmet i en klump veckor innan det körs.",
-          "Den läser och kör koden rad för rad vid körningstillfället.",
-          "Den raderar koden så fort den hittar ett stavfel.",
-          "Den ändrar automatiskt bakgrundsfärgen på skärmen."
-        ],
-        answer: 1,
-        explanation: "En interpreter läser igenom källkoden och verkställer instruktionerna direkt rad för rad."
-      },
-      {
-        id: 16,
-        category: "Exekvering",
-        question: "Hur fungerar en Compiler (kompilator)?",
-        options: [
-          "Den översätter hela programmet till maskinspråk innan det körs.",
-          "Den skriver ut koden på en fysisk skrivare innan datorn startar.",
-          "Den frågar användaren om lov inför varje enskild rad kod.",
-          "Den kan bara köra kod som är skriven på franska."
-        ],
-        answer: 0,
-        explanation: "Compilern tar all källkod i förväg och sammanställer den till en körbar fil bestående av maskinspråk."
-      },
-      {
-        id: 17,
-        category: "Exekvering",
-        question: "Vad är den huvudsakliga skillnaden mellan en compiler och en interpreter?",
-        options: [
-          "Interpretern bygger datorns kretsar medan compilern laddar batteriet.",
-          "Compilern översätter hela programmet i förväg, medan interpretern läser och kör rad för rad.",
-          "Det är ingen skillnad, det är två ord för exakt samma mjukvara.",
-          "Compilern används bara för HTML medan interpretern bara används för spel."
-        ],
-        answer: 1,
-        explanation: "Kompilatorn översätter hela programmet på en gång innan start, medan en tolkare (interpreter) översätter och kör rad för rad dynamiskt."
-      },
-      {
-        id: 18,
         category: "Felsökning",
-        question: "Vad betyder begreppet debugging?",
+        question: "Vad innebär begreppet 'Syntax' inom programmering?",
         options: [
-          "Att dammsuga datorn fri från fysiska insekter.",
-          "Att hitta och rätta fel (buggar) i ett program.",
-          "Att göra programmet så långsamt som möjligt.",
-          "Att ta bort alla kommentarer och funktioner ur koden."
+          "Datorns processorhastighet mätt i gigahertz",
+          "Språkets strikta grammatik och skrivregler (t.ex. kolon, parenteser och stavning)",
+          "Namnet på den fil som skapas vid kompilering",
+          "Minnesåtgången för ett program"
         ],
         answer: 1,
-        explanation: "Debugging (felsökning) handlar om att lokalisera logiska fel, syntaxfel och krascher i ett program och rätta till dem."
+        explanation: "Syntax är programmeringsspråkets regler. Missar man t.ex. ett kolon eller en parentes uppstår ett syntaxfel."
       },
       {
-        id: 19,
-        category: "Verktyg",
-        question: "Vad är en IDE (Integrated Development Environment)?",
+        category: "Felsökning",
+        question: "Vad kallas processen att systematiskt leta upp, förstå och åtgärda fel i programkod?",
         options: [
-          "Ett tangentbord med extra snabba speltangenter.",
-          "Ett samlat program där utvecklare skriver, testar och felsöker kod.",
-          "En serverhall där internetkablar samlas.",
-          "En metod för att stänga av datorn utan strömknapp."
+          "Encoding",
+          "Debugging (avlusning)",
+          "Compilation",
+          "Parsing"
         ],
         answer: 1,
-        explanation: "En IDE är en integrerad utvecklingsmiljö som tillhandahåller textredigerare, kompilator/terminal och felsökningsverktyg på ett ställe."
+        explanation: "Debugging (avlusning) innebär att leta efter fel och 'buggar' och rätta till dem så programmet fungerar rätt."
       },
       {
-        id: 20,
-        category: "Verktyg",
-        question: "Vilket av följande är ett mycket vanligt och modernt exempel på en kodredigerare/IDE?",
+        category: "Python",
+        question: "Vem skapade programspråket Python och vilket år lanserades det?",
         options: [
-          "Microsoft Word",
-          "Visual Studio Code",
-          "Spotify",
-          "Adobe Photoshop"
+          "Dennis Ritchie, 1972",
+          "Guido van Rossum, 1991",
+          "Bjarne Stroustrup, 1985",
+          "James Gosling, 1995"
         ],
         answer: 1,
-        explanation: "Visual Studio Code (VS Code) är en av världens mest använda kodredigerare och IDE-miljöer idag."
+        explanation: "Python skapades och lanserades av nederländaren Guido van Rossum år 1991."
+      },
+      {
+        category: "Python",
+        question: "Vilken filändelse har filer som innehåller Python-kod?",
+        options: [
+          ".exe",
+          ".pt",
+          ".py",
+          ".script"
+        ],
+        answer: 2,
+        explanation: "Python-filer sparas alltid med filändelsen .py (till exempel main.py)."
+      },
+      {
+        category: "Verktyg (IDE)",
+        question: "Vad står förkortningen IDE för?",
+        options: [
+          "Internal Data Engine",
+          "Integrated Development Environment",
+          "Instruction Decoding Element",
+          "Internet Device Emulator"
+        ],
+        answer: 1,
+        explanation: "IDE står för Integrated Development Environment (Integrerad utvecklingsmiljö)."
+      },
+      {
+        category: "Verktyg (IDE)",
+        question: "Vilka tre huvudsakliga verktyg brukar ingå i en komplett IDE (som t.ex. VS Code eller PyCharm)?",
+        options: [
+          "Webbläsare, e-postklient och antivirusprogram",
+          "Textredigerare (med färgmarkering), kompilator/interpretator och debugger",
+          "Kalkylprogram, presentationsverktyg och bildredigerare",
+          "Operativsystem, BIOS och hårdvarudrivrutiner"
+        ],
+        answer: 1,
+        explanation: "En IDE samlar kodredigerare med syntaxfärger, verktyg för att köra koden samt en debugger för att stega och granska variabler."
       }
     ];
 
-    let activeQuestions = [...questionsBank];
-    let currentIndex = 0;
-    let userScore = 0;
-    let userAnswersHistory = [];
-    let hasAnsweredCurrent = false;
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
 
-    const questionCountText = document.getElementById("questionCountText");
-    const percentText = document.getElementById("percentText");
-    const progressFill = document.getElementById("progressFill");
-    const categoryBadge = document.getElementById("categoryBadge");
-    const questionHeading = document.getElementById("questionHeading");
-    const optionsContainer = document.getElementById("optionsContainer");
-    const feedbackContainer = document.getElementById("feedbackContainer");
-    const feedbackIcon = document.getElementById("feedbackIcon");
-    const feedbackStatus = document.getElementById("feedbackStatus");
-    const feedbackText = document.getElementById("feedbackText");
-    const nextQuestionBtn = document.getElementById("nextQuestionBtn");
-    const nextBtnText = document.getElementById("nextBtnText");
-    const scoreTracker = document.getElementById("scoreTracker");
-    const shuffleToggle = document.getElementById("shuffleToggle");
-    const quizCard = document.getElementById("quizCard");
-    const resultCard = document.getElementById("resultCard");
-    const finalScoreVal = document.getElementById("finalScoreVal");
-    const finalPercentVal = document.getElementById("finalPercentVal");
-    const resultComment = document.getElementById("resultComment");
-    const resultBadge = document.getElementById("resultBadge");
-    const reviewList = document.getElementById("reviewList");
-    const restartBtn = document.getElementById("restartBtn");
-    const resetQuickBtn = document.getElementById("resetQuickBtn");
+    // DOM-element
+    const questionText = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    const explanationBox = document.getElementById("explanation-box");
+    const explanationTitle = document.getElementById("explanation-title");
+    const explanationText = document.getElementById("explanation-text");
+    const explanationIcon = document.getElementById("explanation-icon");
+    const nextBtn = document.getElementById("next-btn");
+    const currentIndexEl = document.getElementById("current-index");
+    const totalCountEl = document.getElementById("total-count");
+    const progressBar = document.getElementById("progress");
+    const scoreEl = document.getElementById("score");
+    const categoryEl = document.getElementById("question-category");
+    const quizScreen = document.getElementById("quiz-screen");
+    const resultScreen = document.getElementById("result-screen");
+    const finalScore = document.getElementById("final-score");
+    const finalPercentage = document.getElementById("final-percentage");
+    const gradeComment = document.getElementById("grade-comment");
+    const restartBtn = document.getElementById("restart-btn");
 
-    // Funktion för att blanda array
-    function shuffleArray(array) {
-      const arr = [...array];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
+    function initQuiz() {
+      totalCountEl.textContent = quizData.length;
+      showQuestion();
     }
 
-    function renderQuestion() {
-      hasAnsweredCurrent = false;
-      feedbackContainer.classList.add("hidden");
-      nextQuestionBtn.classList.add("hidden");
+    function showQuestion() {
+      answered = false;
+      const data = quizData[currentQuestion];
 
-      const q = activeQuestions[currentIndex];
-      const total = activeQuestions.length;
-      const progressPercent = Math.round(((currentIndex + 1) / total) * 100);
+      currentIndexEl.textContent = currentQuestion + 1;
+      categoryEl.textContent = data.category;
+      questionText.textContent = data.question;
+      explanationBox.classList.add("hidden");
+      nextBtn.classList.add("hidden");
 
-      questionCountText.textContent = `Fråga ${currentIndex + 1} av ${total}`;
-      percentText.textContent = `${progressPercent}%`;
-      progressFill.style.width = `${progressPercent}%`;
-      categoryBadge.textContent = q.category;
-      questionHeading.textContent = q.question;
+      const progressPercent = ((currentQuestion) / quizData.length) * 100;
+      progressBar.style.width = `${progressPercent}%`;
 
       optionsContainer.innerHTML = "";
-      const letters = ["A", "B", "C", "D"];
 
-      q.options.forEach((optText, index) => {
+      data.options.forEach((opt, idx) => {
         const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-950/40 hover:bg-slate-800/80 hover:border-slate-700 text-slate-200 transition-all duration-150 flex items-start space-x-3 group";
-        
+        btn.className = "w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-850 hover:border-slate-600 hover:bg-slate-800 transition-all duration-150 flex items-center justify-between group";
         btn.innerHTML = `
-          <span class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 group-hover:border-indigo-500 group-hover:text-indigo-300 shrink-0 transition-colors">
-            ${letters[index]}
-          </span>
-          <span class="text-sm font-medium pt-1 flex-1 leading-relaxed">
-            ${optText}
-          </span>
-          <span class="status-marker shrink-0 text-base font-bold hidden ml-2"></span>
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300 group-hover:border-cyan-500/50">
+              ${String.fromCharCode(65 + idx)}
+            </span>
+            <span class="text-sm sm:text-base font-medium text-slate-200">${opt}</span>
+          </div>
         `;
-
-        btn.onclick = () => handleAnswerSelect(index);
+        btn.onclick = () => selectOption(idx, btn);
         optionsContainer.appendChild(btn);
       });
     }
 
-    function handleAnswerSelect(chosenIndex) {
-      if (hasAnsweredCurrent) return;
-      hasAnsweredCurrent = true;
+    function selectOption(selectedIndex, selectedBtn) {
+      if (answered) return;
+      answered = true;
 
-      const q = activeQuestions[currentIndex];
-      const isCorrect = chosenIndex === q.answer;
-      const allButtons = optionsContainer.querySelectorAll("button");
+      const data = quizData[currentQuestion];
+      const buttons = optionsContainer.querySelectorAll("button");
 
-      if (isCorrect) {
-        userScore++;
-        scoreTracker.textContent = `Poäng: ${userScore}`;
-      }
+      buttons.forEach(b => b.disabled = true);
 
-      // Spara till historik
-      userAnswersHistory.push({
-        question: q.question,
-        category: q.category,
-        chosen: chosenIndex,
-        correct: q.answer,
-        options: q.options,
-        isCorrect: isCorrect,
-        explanation: q.explanation
-      });
+      if (selectedIndex === data.answer) {
+        score++;
+        scoreEl.textContent = score;
+        selectedBtn.classList.remove("border-slate-800", "bg-slate-850", "hover:border-slate-600");
+        selectedBtn.classList.add("border-emerald-500", "bg-emerald-950/40", "text-emerald-200");
 
-      // Uppdatera visuell feedback på knapparna
-      allButtons.forEach((btn, idx) => {
-        btn.disabled = true;
-        btn.classList.remove("hover:bg-slate-800/80", "hover:border-slate-700");
-        const marker = btn.querySelector(".status-marker");
-        const badge = btn.querySelector("span:first-child");
-
-        if (idx === q.answer) {
-          btn.classList.add("bg-emerald-950/50", "border-emerald-500/80", "text-emerald-100");
-          badge.classList.add("bg-emerald-500", "text-slate-950", "border-emerald-400");
-          marker.textContent = "✓";
-          marker.classList.remove("hidden");
-          marker.classList.add("text-emerald-400");
-        } else if (idx === chosenIndex && !isCorrect) {
-          btn.classList.add("bg-rose-950/50", "border-rose-500/80", "text-rose-100");
-          badge.classList.add("bg-rose-500", "text-white", "border-rose-400");
-          marker.textContent = "✕";
-          marker.classList.remove("hidden");
-          marker.classList.add("text-rose-400");
-        } else {
-          btn.classList.add("opacity-40");
-        }
-      });
-
-      // Visa feedbackrutan med förklaring
-      feedbackContainer.classList.remove("hidden");
-      if (isCorrect) {
-        feedbackContainer.className = "mt-6 p-4 rounded-xl border bg-emerald-950/40 border-emerald-800/60 text-emerald-200 transition-all";
-        feedbackIcon.textContent = "🎉";
-        feedbackStatus.textContent = "Helt rätt!";
+        explanationBox.className = "rounded-2xl p-5 border border-emerald-800/60 bg-emerald-950/20 mb-6";
+        explanationIcon.textContent = "✅";
+        explanationTitle.className = "font-bold text-sm text-emerald-400 mb-1";
+        explanationTitle.textContent = "Helt rätt!";
       } else {
-        feedbackContainer.className = "mt-6 p-4 rounded-xl border bg-rose-950/40 border-rose-800/60 text-rose-200 transition-all";
-        feedbackIcon.textContent = "💡";
-        feedbackStatus.textContent = "Inte riktigt rätt.";
-      }
-      feedbackText.textContent = q.explanation;
+        selectedBtn.classList.remove("border-slate-800", "bg-slate-850", "hover:border-slate-600");
+        selectedBtn.classList.add("border-rose-500", "bg-rose-950/40", "text-rose-200");
 
-      // Visa nästa-knapp
-      nextBtnText.textContent = (currentIndex === activeQuestions.length - 1) ? "Se Resultat" : "Nästa fråga";
-      nextQuestionBtn.classList.remove("hidden");
+        const correctBtn = buttons[data.answer];
+        correctBtn.classList.remove("border-slate-800", "bg-slate-850");
+        correctBtn.classList.add("border-emerald-500/80", "bg-emerald-950/20", "text-emerald-300");
+
+        explanationBox.className = "rounded-2xl p-5 border border-rose-800/60 bg-rose-950/20 mb-6";
+        explanationIcon.textContent = "❌";
+        explanationTitle.className = "font-bold text-sm text-rose-400 mb-1";
+        explanationTitle.textContent = "Inte riktigt.";
+      }
+
+      explanationText.textContent = data.explanation;
+      explanationBox.classList.remove("hidden");
+      nextBtn.classList.remove("hidden");
+
+      if (currentQuestion === quizData.length - 1) {
+        nextBtn.querySelector("span").textContent = "Se slutresultat";
+      }
     }
 
-    // Nästa fråga klick
-    nextQuestionBtn.onclick = () => {
-      if (currentIndex < activeQuestions.length - 1) {
-        currentIndex++;
-        renderQuestion();
+    nextBtn.onclick = () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        showQuestion();
       } else {
-        displayFinalResults();
+        showResults();
       }
     };
 
-    function displayFinalResults() {
-      quizCard.classList.add("hidden");
-      resultCard.classList.remove("hidden");
+    function showResults() {
+      quizScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+      progressBar.style.width = "100%";
 
-      const total = activeQuestions.length;
-      const percentage = Math.round((userScore / total) * 100);
+      finalScore.textContent = `${score} / ${quizData.length}`;
+      const pct = Math.round((score / quizData.length) * 100);
+      finalPercentage.textContent = `${pct}%`;
 
-      finalScoreVal.textContent = `${userScore} / ${total}`;
-      finalPercentVal.textContent = `${percentage}% Korrekta svar`;
-
-      if (percentage === 100) {
-        resultBadge.textContent = "🌟";
-        resultBadge.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-extrabold bg-emerald-950 text-emerald-300 border border-emerald-600 mb-4";
-        resultComment.textContent = "Mästerligt! Du har full koll på alla begrepp och instruktioner i lektion 1.";
-      } else if (percentage >= 80) {
-        resultBadge.textContent = "🥇";
-        resultBadge.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-extrabold bg-indigo-950 text-indigo-300 border border-indigo-600 mb-4";
-        resultComment.textContent = "Mycket väl godkänt! Du har en stabil grund inom programmeringens grunder.";
-      } else if (percentage >= 50) {
-        resultBadge.textContent = "👍";
-        resultBadge.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-extrabold bg-amber-950 text-amber-300 border border-amber-600 mb-4";
-        resultComment.textContent = "Bra jobbat! Kika igenom de frågor du missade nedan och gör ett nytt försök.";
+      if (pct >= 90) {
+        gradeComment.textContent = "Strålande resultat! Du har stenkoll på grunderna i Programmering nivå 1.";
+      } else if (pct >= 70) {
+        gradeComment.textContent = "Bra jobbat! Du har koll på de viktigaste begreppen, med bara några få missar.";
+      } else if (pct >= 50) {
+        gradeComment.textContent = "Godkänt, men repetera gärna skillnaden mellan kompilator och interpretator samt assembler!";
       } else {
-        resultBadge.textContent = "📚";
-        resultBadge.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-extrabold bg-rose-950 text-rose-300 border border-rose-600 mb-4";
-        resultComment.textContent = "Bra övning! Läs igenom sammanfattningen och fusklappen i lugn och ro, och testa sedan igen.";
+        gradeComment.textContent = "Ta en titt på lektionsanteckningarna en gång till och gör ett nytt försök!";
       }
-
-      // Bygg granskningslistan
-      reviewList.innerHTML = "";
-      userAnswersHistory.forEach((item, idx) => {
-        const card = document.createElement("div");
-        card.className = `p-4 rounded-xl border text-xs sm:text-sm ${
-          item.isCorrect 
-            ? "bg-slate-950/60 border-slate-800" 
-            : "bg-rose-950/20 border-rose-900/40"
-        }`;
-
-        card.innerHTML = `
-          <div class="flex items-start justify-between mb-2">
-            <span class="font-bold text-slate-300">Fråga ${idx + 1}: ${item.question}</span>
-            <span class="${item.isCorrect ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"} ml-2 shrink-0">
-              ${item.isCorrect ? "✓ Rätt" : "✕ Fel"}
-            </span>
-          </div>
-          <div class="space-y-1 text-slate-400 mb-3">
-            <div><strong class="text-slate-300">Ditt svar:</strong> ${item.options[item.chosen]}</div>
-            ${!item.isCorrect ? `<div><strong class="text-emerald-400">Rätt svar:</strong> ${item.options[item.correct]}</div>` : ""}
-          </div>
-          <div class="text-slate-400 italic bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
-            <strong>Förklaring:</strong> ${item.explanation}
-          </div>
-        `;
-        reviewList.appendChild(card);
-      });
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function startQuiz() {
-      currentIndex = 0;
-      userScore = 0;
-      userAnswersHistory = [];
-      hasAnsweredCurrent = false;
-      scoreTracker.textContent = "Poäng: 0";
-
-      if (shuffleToggle.checked) {
-        activeQuestions = shuffleArray(questionsBank);
-      } else {
-        activeQuestions = [...questionsBank];
-      }
-
-      resultCard.classList.add("hidden");
-      quizCard.classList.remove("hidden");
-      renderQuestion();
-    }
-
-    restartBtn.onclick = startQuiz;
-    resetQuickBtn.onclick = () => {
-      if (confirm("Vill du starta om quizet från början?")) {
-        startQuiz();
-      }
+    restartBtn.onclick = () => {
+      currentQuestion = 0;
+      score = 0;
+      scoreEl.textContent = "0";
+      resultScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+      nextBtn.querySelector("span").textContent = "Nästa fråga";
+      showQuestion();
     };
 
-    shuffleToggle.onchange = () => {
-      startQuiz();
-    };
-
-    // Kör igång quizet direkt vid laddning
-    startQuiz();
+    initQuiz();
   </script>
 </body>
 </html>
