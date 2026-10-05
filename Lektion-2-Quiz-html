@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz – Programmering 1 (Lektion 2)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    code, .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></span>
+        <h1 class="text-lg font-bold tracking-tight text-white">Programmering 1 • Lektion 2 Quiz</h1>
+      </div>
+      <div id="stat-pill" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+        Fråga <span id="current-index" class="text-cyan-400">1</span> / <span id="total-count">0</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl shadow-cyan-950/20 relative overflow-hidden">
+      
+      <div class="w-full bg-slate-800 h-2 rounded-full mb-8 overflow-hidden">
+        <div id="progress" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-0 transition-all duration-300 ease-out"></div>
+      </div>
+
+      <div id="quiz-screen">
+        <div class="flex items-center justify-between mb-4">
+          <span id="question-category" class="text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-950/60 border border-cyan-800/50 px-2.5 py-1 rounded-md">Begrepp</span>
+          <span id="score-counter" class="text-xs font-medium text-slate-400">Poäng: <strong id="score" class="text-slate-200">0</strong></span>
+        </div>
+
+        <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-white mb-6 leading-relaxed">
+          Frågan laddas...
+        </h2>
+
+        <div id="options-container" class="space-y-3 mb-6"></div>
+
+        <div id="explanation-box" class="hidden rounded-2xl p-4 sm:p-5 border transition-all duration-200 mb-6">
+          <div class="flex items-start gap-3">
+            <span id="explanation-icon" class="text-xl leading-none mt-0.5">💡</span>
+            <div>
+              <p id="explanation-title" class="font-bold text-sm mb-1"></p>
+              <p id="explanation-text" class="text-sm leading-relaxed text-slate-300"></p>
+            </div>
+          </div>
+        </div>
+
+        <button id="next-btn" class="hidden w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-lg shadow-cyan-500/25 active:scale-[0.99] flex items-center justify-center gap-2">
+          <span>Nästa fråga</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+      </div>
+
+      <div id="result-screen" class="hidden text-center py-4">
+        <div id="result-badge" class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-4xl mb-6">
+          🏆
+        </div>
+        <h2 class="text-3xl font-extrabold text-white mb-2">Quizet är klart!</h2>
+        <p class="text-slate-400 mb-6 text-sm">Bra jobbat med genomgången av Lektion 2!</p>
+
+        <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-8">
+          <div class="bg-slate-850 p-4 rounded-2xl border border-slate-800">
+            <span class="block text-2xl font-black text-cyan-400" id="final-score">0</span>
+            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Antal rätt</span>
+          </div>
+          <div class="bg-slate-850 p-4 rounded-2xl border border-slate-800">
+            <span class="block text-2xl font-black text-cyan-400" id="final-percentage">0%</span>
+            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Träffsäkerhet</span>
+          </div>
+        </div>
+
+        <p id="grade-comment" class="text-base text-slate-200 font-semibold mb-8 max-w-md mx-auto"></p>
+
+        <button id="restart-btn" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-lg shadow-cyan-500/25">
+          Starta om quizet
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900">
+    JENSEN education • Programmering 1 • Lektion 2 Quiz
+  </footer>
+
+  <script>
+    const quizData = [
+      {
+        category: "Variabler i Python",
+        question: "Hur skiljer sig hanteringen av variabler i Python jämfört med statiskt typade språk som C++ eller Java?",
+        options: [
+          "I Python måste man använda nyckelordet var framför namnet",
+          "I Python deklareras variabler automatiskt först i slutet av programmet",
+          "I Python behöver man inte deklarera variabeln i förväg utan den skapas direkt när den tilldelas ett värde",
+          "I Python måste man specificera datatypen manuellt inom hakparenteser"
+        ],
+        answer: 2,
+        explanation: "Python använder dynamisk typning: variabler behöver varken förhandsdeklareras eller ges en explicit typ, utan skapas direkt vid tilldelning."
+      },
+      {
+        category: "Namngivningsregler",
+        question: "Vilket av följande variabelnamn orsakar ett SyntaxError i Python?",
+        options: [
+          "_user_score",
+          "second_user",
+          "2nd_user",
+          "UserTwo"
+        ],
+        answer: 2,
+        explanation: "Ett variabelnamn får innehålla bokstäver, siffror och understreck, men det får ALDRIG börja med en siffra (2nd_user är därmed ogiltigt)."
+      },
+      {
+        category: "Case Sensitivity",
+        question: "Du har skapat variabeln: totalSumma = 100. Vad händer om du därefter kör koden: print(TotalSumma)?",
+        options: [
+          "Värdet 100 skrivs ut eftersom Python ignorerar skiftläge",
+          "Ett NameError uppstår eftersom Python betraktar totalSumma och TotalSumma som två helt skilda namn",
+          "Python skriver automatiskt ut 0 som standardvärde",
+          "Ett TypeError uppstår eftersom variabeln tolkas som en sträng"
+        ],
+        answer: 1,
+        explanation: "Python är strikt case sensitive. Om du stavar med stor bokstav letar den efter en helt annan variabel och ger NameError om den inte hittas."
+      },
+      {
+        category: "Datatyper & Division",
+        question: "Vad returnerar koden print(24 / 3 + 9) i Python 3?",
+        options: [
+          "17",
+          "17.0",
+          "11.0",
+          "Felmeddelande: heltalsdivision krävs"
+        ],
+        answer: 1,
+        explanation: "Vanlig division med / ger alltid ett flyttal (float) i Python. 24 / 3 blir 8.0, och 8.0 + 9 blir 17.0."
+      },
+      {
+        category: "Datatyper",
+        question: "Vilken datatyp har variabeln x efter följande rad: x = '5.0'?",
+        options: [
+          "float",
+          "int",
+          "str",
+          "bool"
+        ],
+        answer: 2,
+        explanation: "Allt som omges av citattecken räknas som textsträngar (str), oavsett om innehållet liknar ett tal eller decimaltal."
+      },
+      {
+        category: "Tilldelning",
+        question: "Vilket värde får variabeln b efter raden: a, b = 10, '20'?",
+        options: [
+          "Heltalet 20 (int)",
+          "Textsträngen '20' (str)",
+          "Tuplen (10, '20')",
+          "Koden ger SyntaxError eftersom man inte får blanda datatyper i multipel tilldelning"
+        ],
+        answer: 1,
+        explanation: "Vid multipel tilldelning paras variablerna ihop i ordning: a får 10 (int) och b får '20' (str)."
+      },
+      {
+        category: "Prioriteringsregler",
+        question: "Vad blir resultatet av uttrycket: 10 + 2 * 3 ** 2?",
+        options: [
+          "108",
+          "28",
+          "256",
+          "46"
+        ],
+        answer: 1,
+        explanation: "Potens (**) har högre prioritet än multiplikation (*), som har högre prioritet än addition (+). 3 ** 2 = 9. Sedan 2 * 9 = 18. Slutligen 10 + 18 = 28."
+      },
+      {
+        category: "Kommentarer",
+        question: "Vad skrivs ut när följande program körs?\n# print('Alfa')\nprint('Beta') # print('Gamma')",
+        options: [
+          "Beta\nGamma",
+          "Alfa\nBeta\nGamma",
+          "Beta",
+          "Inget, raden ger ett SyntaxError"
+        ],
+        answer: 2,
+        explanation: "All text efter ett #-tecken på samma rad ignoreras helt av interpretatorn. Endast 'Beta' exekveras och skrivs ut."
+      },
+      {
+        category: "Print med kommatecken",
+        question: "Vad är skillnaden i utskrift mellan print('Summa:', 5 + 5) och print('Summa:' + '10')?",
+        options: [
+          "Det är ingen skillnad, båda skriver ut 'Summa: 10'",
+          "print('Summa:', 5 + 5) ger automatiskt ett mellanrum och skriver 'Summa: 10', medan strängpluset sätter ihop dem utan extra mellanrum ('Summa:10')",
+          "print med kommatecken genererar ett felmeddelande om man blandar strängar och tal",
+          "print('Summa:' + '10') utför matematisk addition och skriver 'Summa: 20'"
+        ],
+        answer: 1,
+        explanation: "När man skickar flera argument till print() separerade med komma lägger Python automatiskt till ett mellanslag mellan dem."
+      },
+      {
+        category: "Escape-sekvenser",
+        question: "Vad blir utskriften av koden: print('A\\nB\\tC')?",
+        options: [
+          "A och B på samma rad, och C på raden under",
+          "A på första raden, sedan B följt av ett tabulatorsteg och C på andra raden",
+          "Texten 'A\\nB\\tC' exakt som den är skriven",
+          "Ett SyntaxError på grund av otillåtna bakåtsnedstreck"
+        ],
+        answer: 1,
+        explanation: "\\n skapar ett radbyte (så B hamnar på en ny rad), och \\t skapar ett tab-indrag innan C."
+      },
+      {
+        category: "Strängoperationer",
+        question: "Vad resulterar uttrycket: print(2 * '3' + '4') i?",
+        options: [
+          "10",
+          "334",
+          "24",
+          "TypeError: Unsupported operand"
+        ],
+        answer: 1,
+        explanation: "Multiplikation av en sträng repeterar den: 2 * '3' blir '33'. Konkatenering med +'4' ger strängen '334'."
+      },
+      {
+        category: "Jämförelseoperatorer",
+        question: "Vad är skillnaden mellan ett likhetstecken (=) och dubbla likhetstecken (==) i Python?",
+        options: [
+          "= används för tilldelning (spara värde); == används för att jämföra om två värden är lika",
+          "= används för tal; == används uteslutande för textsträngar",
+          "= och == fungerar identiskt, == är bara en äldre notation",
+          "= jämför värden; == deklarerar en konstant"
+        ],
+        answer: 0,
+        explanation: "Ett enkelt likhetstecken (=) sparar data i en variabel. Dubbla (==) är en logisk jämförelse som ger True eller False."
+      },
+      {
+        category: "Booleska värden",
+        question: "Vilket av följande anrop returnerar värdet False?",
+        options: [
+          "bool('False')",
+          "bool(-10)",
+          "bool(' ')",
+          "bool('')"
+        ],
+        answer: 3,
+        explanation: "En helt tom textsträng ('') utvärderas till False. Strängar som har innehåll (även mellanslag eller texten 'False') och tal som inte är noll utvärderas till True."
+      },
+      {
+        category: "Datatyper med type()",
+        question: "Vad skriver koden print(type(10 > 5)) ut?",
+        options: [
+          "<class 'int'>",
+          "<class 'bool'>",
+          "<class 'comparison'>",
+          "True"
+        ],
+        answer: 1,
+        explanation: "Uttrycket 10 > 5 utvärderas först till det booleska värdet True. type(True) returnerar då klassen <class 'bool'>."
+      },
+      {
+        category: "Felsökning",
+        question: "Om du råkar skriva: print(12 - 7, 5,6) i stället för 5.6 – hur tolkar Python kommatecknet inuti talet?",
+        options: [
+          "Det ger omedelbart ett syntaxfel vid körning",
+          "Python ignorerar kommat och behandlar det som 56",
+          "Python tolkar det som två separata argument: talet 5 och talet 6",
+          "Python konverterar det automatiskt till flyttalet 5.6"
+        ],
+        answer: 2,
+        explanation: "I Python (och engelskspråkig kod) används punkt för decimaler. Ett kommatecken separerar alltid olika värden eller funktionsargument."
+      },
+      {
+        category: "VS Code Genvägar",
+        question: "Vilket kortkommando i VS Code öppnar 'Command Palette' (kommandopaletten), till skillnad från Quick Open för filer?",
+        options: [
+          "Ctrl + P",
+          "Ctrl + Shift + P",
+          "Ctrl + Shift + O",
+          "Alt + P"
+        ],
+        answer: 1,
+        explanation: "Ctrl + P öppnar snabbsökaren för filer, medan Ctrl + Shift + P (eller F1) öppnar själva kommandopaletten."
+      },
+      {
+        category: "VS Code Genvägar",
+        question: "Vad händer när du markerar ett ord i VS Code och trycker på Ctrl + F2?",
+        options: [
+          "Det markerade ordet raderas i hela dokumentet",
+          "Alla förekomster av det markerade ordet i hela dokumentet väljs för samtidig redigering",
+          "Ordet formateras med stora bokstäver",
+          "Du hoppar direkt till funktionens ursprungliga definition"
+        ],
+        answer: 1,
+        explanation: "Ctrl + F2 väljer alla förekomster av det aktuella ordet så att du kan skriva om eller byta namn på det överallt samtidigt."
+      },
+      {
+        category: "VS Code Genvägar",
+        question: "Hur skapar du multipla markörer på valfria ställen i koden med musen?",
+        options: [
+          "Håll ner Shift och klicka",
+          "Håll ner Ctrl och rulla på scrollhjulet",
+          "Håll ner Alt och klicka på de platser du vill redigera",
+          "Dubbelklicka samtidigt som du trycker på mellanslag"
+        ],
+        answer: 2,
+        explanation: "Genom att hålla nere Alt-tangenten och klicka infogas en ny textmarkör för varje klick."
+      },
+      {
+        category: "VS Code Genvägar",
+        question: "Vad är det snabbaste sättet att flytta en hel kodrad uppåt i editorn utan att markera, klippa och klistra in?",
+        options: [
+          "Trycka Ctrl + Up Arrow",
+          "Trycka Alt + Up Arrow",
+          "Trycka Ctrl + Shift + K",
+          "Trycka Tab + Up Arrow"
+        ],
+        answer: 1,
+        explanation: "Alt + Pil uppåt flyttar den aktuella raden ett steg uppåt i filen. (Ctrl + Shift + K raderar raden)."
+      },
+      {
+        category: "VS Code Genvägar",
+        question: "Vilket kortkommando triggar manuellt upp förslagsrutan med kodkomplettering (IntelliSense) om den stängts?",
+        options: [
+          "Ctrl + Space",
+          "Ctrl + Enter",
+          "Shift + F12",
+          "Alt + Enter"
+        ],
+        answer: 0,
+        explanation: "Ctrl + Space är standardkommandot för att tvinga fram kodförslag och autokomplettering i editorn."
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    const questionText = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    const explanationBox = document.getElementById("explanation-box");
+    const explanationTitle = document.getElementById("explanation-title");
+    const explanationText = document.getElementById("explanation-text");
+    const explanationIcon = document.getElementById("explanation-icon");
+    const nextBtn = document.getElementById("next-btn");
+    const currentIndexEl = document.getElementById("current-index");
+    const totalCountEl = document.getElementById("total-count");
+    const progressBar = document.getElementById("progress");
+    const scoreEl = document.getElementById("score");
+    const categoryEl = document.getElementById("question-category");
+    const quizScreen = document.getElementById("quiz-screen");
+    const resultScreen = document.getElementById("result-screen");
+    const finalScore = document.getElementById("final-score");
+    const finalPercentage = document.getElementById("final-percentage");
+    const gradeComment = document.getElementById("grade-comment");
+    const restartBtn = document.getElementById("restart-btn");
+
+    function initQuiz() {
+      totalCountEl.textContent = quizData.length;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      answered = false;
+      const data = quizData[currentQuestion];
+
+      currentIndexEl.textContent = currentQuestion + 1;
+      categoryEl.textContent = data.category;
+      questionText.textContent = data.question;
+      explanationBox.classList.add("hidden");
+      nextBtn.classList.add("hidden");
+
+      const progressPercent = ((currentQuestion) / quizData.length) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+
+      optionsContainer.innerHTML = "";
+
+      data.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-850 hover:border-slate-600 hover:bg-slate-800 transition-all duration-150 flex items-center justify-between group";
+        btn.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300 group-hover:border-cyan-500/50">
+              ${String.fromCharCode(65 + idx)}
+            </span>
+            <span class="text-sm sm:text-base font-medium text-slate-200">${opt}</span>
+          </div>
+        `;
+        btn.onclick = () => selectOption(idx, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectOption(selectedIndex, selectedBtn) {
+      if (answered) return;
+      answered = true;
+
+      const data = quizData[currentQuestion];
+      const buttons = optionsContainer.querySelectorAll("button");
+
+      buttons.forEach(b => b.disabled = true);
+
+      if (selectedIndex === data.answer) {
+        score++;
+        scoreEl.textContent = score;
+        selectedBtn.classList.remove("border-slate-800", "bg-slate-850", "hover:border-slate-600");
+        selectedBtn.classList.add("border-emerald-500", "bg-emerald-950/40", "text-emerald-200");
+
+        explanationBox.className = "rounded-2xl p-5 border border-emerald-800/60 bg-emerald-950/20 mb-6";
+        explanationIcon.textContent = "✅";
+        explanationTitle.className = "font-bold text-sm text-emerald-400 mb-1";
+        explanationTitle.textContent = "Helt rätt!";
+      } else {
+        selectedBtn.classList.remove("border-slate-800", "bg-slate-850", "hover:border-slate-600");
+        selectedBtn.classList.add("border-rose-500", "bg-rose-950/40", "text-rose-200");
+
+        const correctBtn = buttons[data.answer];
+        correctBtn.classList.remove("border-slate-800", "bg-slate-850");
+        correctBtn.classList.add("border-emerald-500/80", "bg-emerald-950/20", "text-emerald-300");
+
+        explanationBox.className = "rounded-2xl p-5 border border-rose-800/60 bg-rose-950/20 mb-6";
+        explanationIcon.textContent = "❌";
+        explanationTitle.className = "font-bold text-sm text-rose-400 mb-1";
+        explanationTitle.textContent = "Inte riktigt.";
+      }
+
+      explanationText.textContent = data.explanation;
+      explanationBox.classList.remove("hidden");
+      nextBtn.classList.remove("hidden");
+
+      if (currentQuestion === quizData.length - 1) {
+        nextBtn.querySelector("span").textContent = "Se slutresultat";
+      }
+    }
+
+    nextBtn.onclick = () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        showQuestion();
+      } else {
+        showResults();
+      }
+    };
+
+    function showResults() {
+      quizScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+      progressBar.style.width = "100%";
+
+      finalScore.textContent = `${score} / ${quizData.length}`;
+      const pct = Math.round((score / quizData.length) * 100);
+      finalPercentage.textContent = `${pct}%`;
+
+      if (pct >= 90) {
+        gradeComment.textContent = "Exceptionellt bra! Du har stenkoll på detaljerna, operatorerna och syntaktiska fällor.";
+      } else if (pct >= 70) {
+        gradeComment.textContent = "Riktigt bra resultat! Du hanterar grunderna och reglerna i Python med stor säkerhet.";
+      } else if (pct >= 50) {
+        gradeComment.textContent = "Godkänt! Håll extra koll på skillnaden mellan strängar/siffror och hur division hanteras i Python.";
+      } else {
+        gradeComment.textContent = "Repetera lektionsbilderna om variabler, operatorer och datatyper och försök igen!";
+      }
+    }
+
+    restartBtn.onclick = () => {
+      currentQuestion = 0;
+      score = 0;
+      scoreEl.textContent = "0";
+      resultScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+      nextBtn.querySelector("span").textContent = "Nästa fråga";
+      showQuestion();
+    };
+
+    initQuiz();
+  </script>
+</body>
+</html>
