@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skriv-Quiz – Programmering 1 (Lektion 1 & 2)</title>
+  <title>Koncept-Quiz – Programmering 1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -22,7 +22,7 @@
     <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></span>
-        <h1 class="text-lg font-bold tracking-tight text-white">Programmering 1 • Skriv-Quiz</h1>
+        <h1 class="text-lg font-bold tracking-tight text-white">Programmering 1 • Förklarings-Quiz</h1>
       </div>
       <div id="stat-pill" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
         Fråga <span id="current-index" class="text-cyan-400">1</span> / <span id="total-count">0</span>
@@ -43,48 +43,50 @@
       <div id="quiz-screen">
         <div class="flex items-center justify-between mb-4">
           <span id="question-category" class="text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-950/60 border border-cyan-800/50 px-2.5 py-1 rounded-md">Kategori</span>
-          <span id="score-counter" class="text-xs font-medium text-slate-400">Poäng: <strong id="score" class="text-slate-200">0</strong></span>
+          <span id="score-counter" class="text-xs font-medium text-slate-400">Godkända svar: <strong id="score" class="text-slate-200">0</strong></span>
         </div>
 
-        <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-white mb-6 leading-relaxed">
+        <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-white mb-2 leading-relaxed">
           Frågan laddas...
         </h2>
+        <p class="text-xs text-slate-400 mb-6 italic">Beskriv med egna ord i en eller ett par meningar.</p>
 
         <!-- Input Form -->
-        <form id="answer-form" class="space-y-4 mb-6" onsubmit="event.preventDefault(); handleSubmit();">
-          <div>
-            <label for="user-input" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Ditt svar:</label>
-            <div class="relative">
-              <input 
-                type="text" 
-                id="user-input" 
-                autocomplete="off" 
-                spellcheck="false"
-                placeholder="Skriv ditt svar här..." 
-                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 mono text-base transition-all"
-              />
-            </div>
-          </div>
+        <div id="input-container" class="space-y-4 mb-6">
+          <textarea 
+            id="user-input" 
+            rows="4"
+            spellcheck="false"
+            placeholder="Skriv din förklaring här..." 
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm leading-relaxed transition-all resize-none"
+          ></textarea>
           
           <button 
-            type="submit" 
+            type="button" 
             id="submit-btn" 
+            onclick="handleSubmit()" 
             class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-lg shadow-cyan-500/25 active:scale-[0.99] flex items-center justify-center gap-2">
-            <span>Rätta svar</span>
+            <span>Granska mitt svar</span>
           </button>
-        </form>
+        </div>
 
-        <!-- Feedback Box -->
-        <div id="feedback-box" class="hidden rounded-2xl p-5 border transition-all duration-200 mb-6">
+        <!-- Evaluation & Model Answer Box -->
+        <div id="feedback-box" class="hidden rounded-2xl p-5 border transition-all duration-200 mb-6 space-y-4">
           <div class="flex items-start gap-3">
             <span id="feedback-icon" class="text-2xl leading-none mt-0.5"></span>
-            <div class="w-full">
+            <div>
               <p id="feedback-title" class="font-bold text-sm mb-1"></p>
-              <div id="feedback-correct-answer" class="text-xs mono mb-2 text-slate-400 hidden">
-                Rätt svar: <span class="text-white font-semibold" id="correct-answer-text"></span>
-              </div>
-              <p id="feedback-explanation" class="text-sm leading-relaxed text-slate-300"></p>
+              <p id="feedback-analysis" class="text-xs text-slate-300 leading-relaxed"></p>
             </div>
+          </div>
+
+          <div class="border-t border-slate-800/80 pt-3">
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-1">Mallsvar från lektionsmaterialet:</p>
+            <p id="model-answer" class="text-sm text-slate-200 bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 leading-relaxed"></p>
+          </div>
+
+          <div id="keyword-tags" class="flex flex-wrap gap-1.5 pt-1">
+            <!-- Nyckelord genereras dynamiskt -->
           </div>
         </div>
 
@@ -101,19 +103,19 @@
       <!-- Result Screen -->
       <div id="result-screen" class="hidden text-center py-4">
         <div id="result-badge" class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-4xl mb-6">
-          🏆
+          🎓
         </div>
-        <h2 class="text-3xl font-extrabold text-white mb-2">Quizet är klart!</h2>
-        <p class="text-slate-400 mb-6 text-sm">Sammanställning av dina svar för Lektion 1 & 2.</p>
+        <h2 class="text-3xl font-extrabold text-white mb-2">Bra jobbat med förklaringarna!</h2>
+        <p class="text-slate-400 mb-6 text-sm">Att formulera svaren med egna ord ger en djupare förståelse än flerval.</p>
 
         <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-8">
           <div class="bg-slate-850 p-4 rounded-2xl border border-slate-800">
             <span class="block text-2xl font-black text-cyan-400" id="final-score">0</span>
-            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Antal rätt</span>
+            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Träffade nyckelbegrepp</span>
           </div>
           <div class="bg-slate-850 p-4 rounded-2xl border border-slate-800">
             <span class="block text-2xl font-black text-cyan-400" id="final-percentage">0%</span>
-            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Träffsäkerhet</span>
+            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Förståelsegrad</span>
           </div>
         </div>
 
@@ -128,181 +130,124 @@
   </main>
 
   <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900">
-    JENSEN education • Programmering 1 (Nivå 1) • Självstudier
+    JENSEN education • Programmering 1 • Begreppsförståelse
   </footer>
 
   <script>
-    const quizData = [
-      // --- LEKTION 1 ---
+    const conceptQuizData = [
       {
-        category: "Lektion 1 • Dataenheter",
-        question: "Hur många bitar (b) ingår det i exakt 1 Byte (B)?",
-        displayAnswer: "8",
-        acceptedAnswers: ["8", "åtta", "8 bitar", "åtta bitar"],
-        explanation: "1 Byte består alltid av 8 bitar. Minsta informationsenheten är en bit (0 eller 1)."
+        category: "Grundbegrepp",
+        question: "Vad är ett programspråk och varför behövs det?",
+        modelAnswer: "Ett programspråk är ett formellt, strukturerat språk som människor använder för att ge instruktioner och skapa program till en dator. Det behövs eftersom människor inte kan skriva i ren maskinkod (ettor och nollor), så källkoden måste formuleras i ett språk som sedan kan översättas.",
+        requiredKeywords: [
+          ["instruktion", "instruktioner", "kommando", "prata"],
+          ["människa", "människor", "vi"],
+          ["maskinkod", "ettor och nollor", "översättas", "datorn"]
+        ]
       },
       {
-        category: "Lektion 1 • Dataenheter",
-        question: "Hur många Kilobytes (KB) motsvarar 1 Megabyte (MB)?",
-        displayAnswer: "1024",
-        acceptedAnswers: ["1024", "1 024", "1024 kb", "1 024 kb"],
-        explanation: "Inom datateknik baseras enheterna på potensen 2¹⁰, vilket innebär att 1 MB är 1 024 KB."
+        category: "Grundbegrepp",
+        question: "Vad är ett datorprogram?",
+        modelAnswer: "Ett datorprogram är en organiserad serie/följd av instruktioner (ungefär som ett recept) som i detalj talar om för datorns processor exakt vilka operationer den ska utföra.",
+        requiredKeywords: [
+          ["serie", "följd", "lista", "recept", "ordning"],
+          ["instruktion", "instruktioner", "operationer", "uppgift"]
+        ]
       },
       {
-        category: "Lektion 1 • Maskinkod",
-        question: "Vad kallas datorns grundspråk som CPU:n kan köra direkt och som uteslutande består av ettor och nollor?",
-        displayAnswer: "Maskinkod",
-        acceptedAnswers: ["maskinkod", "maskinspråk", "maskin kod", "machine code"],
-        explanation: "Datorns hårdvara och CPU kan i grund och botten endast köra instruktioner som är lagrade i ren maskinkod."
+        category: "Lågnivåspråk",
+        question: "Vad är ett assembleringsspråk (assembler) och hur körs det?",
+        modelAnswer: "Assembler är ett lågnivåspråk som ligger mycket nära hårdvaran och maskinspråket. Istället för bara ettor och nollor använder man korta textkommandon (mnemoniska symboler som ADD och MOV). Det kan inte köras direkt av processorn, utan måste först översättas till maskinkod av en assemblator.",
+        requiredKeywords: [
+          ["lågnivå", "nära hårdvaran", "lågnivåspråk"],
+          ["mnemonisk", "symboler", "textkommando", "add", "mov", "korta"],
+          ["assemblator", "översättas", "maskinkod", "assembler"]
+        ]
       },
       {
-        category: "Lektion 1 • Assemblerspråk",
-        question: "Vilket specifikt program översätter källkod i assembleringsspråk till maskinkod?",
-        displayAnswer: "Assemblator (eller Assembler)",
-        acceptedAnswers: ["assemblator", "assembler", "en assemblator", "en assembler"],
-        explanation: "Kedjan är: Assembleringsspråk ➔ Assemblator (assembler) ➔ Maskinkod."
+        category: "Högnivåspråk",
+        question: "Vad är ett högnivåspråk och vad skiljer det från lågnivåspråk?",
+        modelAnswer: "Ett högnivåspråk (t.ex. Python eller Java) är utformat för att vara lätt för människor att läsa och skriva. Språket liknar vanlig engelska eller matematik. Till skillnad från lågnivåspråk behöver utvecklaren inte tänka på specifika minnesregister eller hårdvarudetaljer.",
+        requiredKeywords: [
+          ["lätt", "enkelt", "läsa", "skriva", "människor"],
+          ["engelska", "halvengelska", "matte", "matematik"],
+          ["python", "java", "abstraherat", "lågnivå"]
+        ]
       },
       {
-        category: "Lektion 1 • Datorhistoria",
-        question: "Vad hette den tidiga datorn (byggd ca 1946 på cirka 130 kvm) som man programmerade manuellt med switchar och kablar innan assembler fanns?",
-        displayAnswer: "ENIAC",
-        acceptedAnswers: ["eniac"],
-        explanation: "ENIAC programmerades helt manuellt med fysiska kopplingar och strömbrytare."
+        category: "Översättare",
+        question: "Vad är en kompilator (compiler) och hur arbetar den?",
+        modelAnswer: "En kompilator läser igenom hela källkoden på en gång i förväg. Om det inte finns några syntaxfel skapar den en fristående körbar fil (t.ex. en .exe-fil). Den hittar fel i förväg och det färdiga programmet körs mycket snabbt.",
+        requiredKeywords: [
+          ["hela", "allt", "i förväg", "på en gång"],
+          ["körbar", "fil", "exe", "binärfil", "översätter"]
+        ]
       },
       {
-        category: "Lektion 1 • Kompilator vs Interpretator",
-        question: "Vilken typ av översättare (kompilator eller interpretator) läser och kör källkoden direkt rad för rad i minnet under drift?",
-        displayAnswer: "Interpretator",
-        acceptedAnswers: ["interpretator", "interpreter", "tolk", "interpretatorn"],
-        explanation: "En interpretator tolkar och exekverar koden rad för rad i realtid, medan en kompilator översätter hela projektet i förväg."
+        category: "Översättare",
+        question: "Vad är en interpretator (interpreter) och hur arbetar den?",
+        modelAnswer: "En interpretator fungerar som en direkt-tolk som läser och översätter källkoden rad för rad i realtid under tiden programmet faktiskt körs. Ingen fristående .exe-fil skapas, och om den stöter på ett fel stannar programmet tvärt på just den raden.",
+        requiredKeywords: [
+          ["rad för rad", "rad efter rad", "tolk", "realtid", "under körning"],
+          ["körs", "stannar", "kraschar", "översätter"]
+        ]
       },
       {
-        category: "Lektion 1 • Felsökning",
-        question: "Vad kallas den systematiska processen att leta upp, analysera och åtgärda buggar/fel i kod?",
-        displayAnswer: "Debugging (Avlusning)",
-        acceptedAnswers: ["debugging", "avlusning", "debug", "felsökning"],
-        explanation: "Debugging (på svenska ibland avlusning) innebär att hitta och korrigera felaktigheter i koden."
+        category: "Översättare",
+        question: "Vad är den huvudsakliga skillnaden mellan en kompilator och en interpretator vid felsökning och körhastighet?",
+        modelAnswer: "Med en kompilator måste alla syntaxfel rättas i förväg innan programmet ens kan skapas, men själva programmet körs sedan mycket snabbare. Med en interpretator startar programmet direkt och kör all felfri kod fram till felraden, men exekveringen är i regel långsammare.",
+        requiredKeywords: [
+          ["snabbare", "fart", "hastighet"],
+          ["före", "innan", "rad för rad", "stannar"]
+        ]
       },
       {
-        category: "Lektion 1 • Python fakta",
-        question: "Vilket år lanserades programmeringsspråket Python officiellt av Guido van Rossum?",
-        displayAnswer: "1991",
-        acceptedAnswers: ["1991", "år 1991"],
-        explanation: "Guido van Rossum skapade Python i Nederländerna och släppte version 0.9.0 år 1991."
+        category: "Verktyg",
+        question: "Vad är en IDE (Integrated Development Environment) och vad innehåller den?",
+        modelAnswer: "En IDE är ett allt-i-ett-program för utvecklare. Den samlar de nödvändiga verktygen på samma plats: en textredigerare (editor med färgmarkering), en kompilator/interpretator för att köra koden med en knapp, samt en debugger för att hitta och rätta fel.",
+        requiredKeywords: [
+          ["editor", "textredigerare", "skriva kod"],
+          ["köra", "kompilator", "interpretator"],
+          ["debugger", "felsökare", "hitta fel", "verktyg"]
+        ]
       },
       {
-        category: "Lektion 1 • Python fakta",
-        question: "Vilken filändelse har sparade Python-filer?",
-        displayAnswer: ".py",
-        acceptedAnswers: [".py", "py"],
-        explanation: "Python-skript sparas med filtillägget .py (t.ex. program.py)."
-      },
-      {
-        category: "Lektion 1 • VS Code Snabbkommando",
-        question: "Vilket kortkommando öppnar Command Palette (kommandopaletten) i VS Code?",
-        displayAnswer: "Ctrl + Shift + P (eller F1)",
-        acceptedAnswers: ["ctrl+shift+p", "ctrl + shift + p", "f1", "cmd+shift+p", "cmd + shift + p"],
-        explanation: "Ctrl + Shift + P öppnar kommandopaletten där man når alla tillgängliga kommandon i VS Code."
-      },
-      {
-        category: "Lektion 1 • VS Code Snabbkommando",
-        question: "Vilket snabbkommando trycker du på i editorn för att trigga manuell autokomplettering (kodförslag / IntelliSense)?",
-        displayAnswer: "Ctrl + Space",
-        acceptedAnswers: ["ctrl+space", "ctrl + space", "ctrl + mellanslag", "ctrl+mellanslag"],
-        explanation: "Ctrl + Space tvingar fram autokompletteringsrutan."
-      },
-
-      // --- LEKTION 2 ---
-      {
-        category: "Lektion 2 • Kommentarer",
-        question: "Vilket tecken används i Python för att skriva en enradskommentar som interpretatorn hoppar över?",
-        displayAnswer: "# (brädgård / hashtag)",
-        acceptedAnswers: ["#", "hashtag", "brädgård", "nummertecken"],
-        explanation: "I Python inleds kommentarer alltid med #."
-      },
-      {
-        category: "Lektion 2 • Datatyper",
-        question: "Vilken datatyp får en variabel i Python om den tilldelas ett decimaltal, som t.ex. x = 4.6?",
-        displayAnswer: "float",
-        acceptedAnswers: ["float", "flyttal"],
-        explanation: "Decimaltal representeras av datatypen float (flyttal) i Python. (Heltal kallas int)."
+        category: "Lektion 2 • Variabler",
+        question: "Vad är en variabel i programmering och hur skapas den i Python?",
+        modelAnswer: "En variabel är en namngiven plats i datorns minne där man sparar ett värde (t.ex. tal eller text) för att använda senare, ungefär som en märkt låda. I Python skapas den automatiskt och direkt när man tilldelar den ett värde med ett likhetstecken (=), utan att man behöver deklarera den i förväg.",
+        requiredKeywords: [
+          ["minne", "plats", "låda", "spara", "lagra"],
+          ["värde", "data"],
+          ["tilldelar", "tilldelning", "=", "deklarera"]
+        ]
       },
       {
         category: "Lektion 2 • Datatyper",
-        question: "Vilken datatyp tilldelas variabeln text i följande kod: text = '123'?",
-        displayAnswer: "str (string / sträng)",
-        acceptedAnswers: ["str", "string", "sträng"],
-        explanation: "Allt som omges av citattecken (' eller \") tolkas alltid som en textsträng (str), inte ett tal."
+        question: "Vad är skillnaden mellan ett numeriskt uttryck som 1 + 1 och ett stränguttryck som '1' + '1' i Python?",
+        modelAnswer: "1 + 1 är en matematisk beräkning mellan två heltal (int) som adderas och resulterar i 2. '1' + '1' är två textsträngar (str) som sätts ihop efter varandra (konkateneras), vilket resulterar i texten '11'.",
+        requiredKeywords: [
+          ["2", "adderas", "matematisk", "räknar"],
+          ["11", "sträng", "text", "sätts ihop", "konkateneras"]
+        ]
       },
       {
-        category: "Lektion 2 • Strängoperationer",
-        question: "Vad blir den exakta utskriften av följande kod: print('1' + '1')?",
-        displayAnswer: "11",
-        acceptedAnswers: ["11", "'11'"],
-        explanation: "Eftersom det är två textsträngar konkateneras (sammanfogas) de till '11', istället för att adderas matematiskt till 2."
+        category: "Lektion 2 • Booleska värden",
+        question: "Vad är ett booleskt värde och vilka regler gäller när värden utvärderas med bool() i Python?",
+        modelAnswer: "Ett booleskt värde kan bara vara antingen True eller False. Nästan alla värden blir True om de har något innehåll. Det som utvärderas till False är framför allt talet 0, tomma strängar ('') och tomma listor/samlingar.",
+        requiredKeywords: [
+          ["true", "false", "sant", "falskt"],
+          ["0", "noll", "tomma", "tom"]
+        ]
       },
       {
-        category: "Lektion 2 • Strängoperationer",
-        question: "Vad blir den exakta utskriften av koden: print(3 * 'hej')?",
-        displayAnswer: "hejhejhej",
-        acceptedAnswers: ["hejhejhej", "'hejhejhej'"],
-        explanation: "När man multiplicerar ett heltal med en sträng repeteras texten utan extra mellanslag: 'hejhejhej'."
-      },
-      {
-        category: "Lektion 2 • Prioriteringsregler & Division",
-        question: "Vad blir resultatet av beräkningen i Python: print(24 / 3 + 9)? (Tänk på datatypen vid division!)",
-        displayAnswer: "17.0",
-        acceptedAnswers: ["17.0"],
-        explanation: "Division med / resulterar alltid i ett flyttal (float) i Python 3. 24 / 3 = 8.0. Därefter 8.0 + 9 = 17.0."
-      },
-      {
-        category: "Lektion 2 • Beräkning",
-        question: "Vad blir resultatet av uttrycket: print(8 * 2 * (5 - 3) + 16 / 4 - 1)?",
-        displayAnswer: "35.0",
-        acceptedAnswers: ["35.0", "35"],
-        explanation: "(5-3)=2. Sedan: 8*2*2 = 32. 16/4 = 4.0. 32 + 4.0 - 1 = 35.0."
-      },
-      {
-        category: "Lektion 2 • Escape-tecken",
-        question: "Vilken escape-sekvens (bakåtsnedstreck + bokstav) skriver du inuti en sträng för att göra ett radbyte (ny rad)?",
-        displayAnswer: "\\n",
-        acceptedAnswers: ["\\n", "/n"],
-        explanation: "\\n står för newline och flyttar markören till nästa rad vid utskrift."
-      },
-      {
-        category: "Lektion 2 • Escape-tecken",
-        question: "Vilken escape-sekvens använder man för att lägga till ett tab-indrag (indentering) i en sträng?",
-        displayAnswer: "\\t",
-        acceptedAnswers: ["\\t", "/t"],
-        explanation: "\\t motsvarar en tangenttryckning på Tab och ger ett fast indrag."
-      },
-      {
-        category: "Lektion 2 • Booleska uttryck",
-        question: "Vad returnerar Python om du kör: print(10 == 9)? (Svara med True eller False)",
-        displayAnswer: "False",
-        acceptedAnswers: ["false"],
-        explanation: "Dubbla likhetstecken (==) kontrollerar likhet. Eftersom 10 inte är lika med 9 returneras False."
-      },
-      {
-        category: "Lektion 2 • Sanningstester",
-        question: "Vad returnerar funktionsanropet bool(0) i Python?",
-        displayAnswer: "False",
-        acceptedAnswers: ["false"],
-        explanation: "Talet 0 samt tomma strängar/listor utvärderas alltid till False med funktionen bool(). Alla tal skilda från noll ger True."
-      },
-      {
-        category: "Lektion 2 • Funktioner",
-        question: "Vilken inbyggd funktion i Python använder du för att ta reda på och skriva ut vilken datatyp en variabel har?",
-        displayAnswer: "type()",
-        acceptedAnswers: ["type", "type()"],
-        explanation: "Funktionen type(variabel) returnerar datatypen, t.ex. <class 'int'> eller <class 'str'>."
-      },
-      {
-        category: "Lektion 2 • Namngivningsregler",
-        question: "Får ett variabelnamn i Python börja med en siffra (t.ex. 1st_name)? (Svara Ja eller Nej)",
-        displayAnswer: "Nej",
-        acceptedAnswers: ["nej", "no"],
-        explanation: "Ett variabelnamn får innehålla siffror, men det får aldrig börja med en siffra. Det ger SyntaxError."
+        category: "Lektion 2 • Syntax & Regler",
+        question: "Nämn tre viktiga regler för hur man får namnge variabler i Python.",
+        modelAnswer: "1) Variabelnamn får innehålla bokstäver, siffror och understreck (_). 2) De får ALDRIG börja med en siffra. 3) De får inte innehålla mellanslag eller specialtecken. Dessutom skiljer Python på stora och små bokstäver (case sensitive).",
+        requiredKeywords: [
+          ["siffra", "siffror"],
+          ["börja", "starta"],
+          ["mellanslag", "understreck", "_", "case sensitive", "stora och små"]
+        ]
       }
     ];
 
@@ -310,7 +255,6 @@
     let score = 0;
     let answered = false;
 
-    // DOM-element
     const questionText = document.getElementById("question-text");
     const categoryEl = document.getElementById("question-category");
     const currentIndexEl = document.getElementById("current-index");
@@ -323,9 +267,9 @@
     const feedbackBox = document.getElementById("feedback-box");
     const feedbackIcon = document.getElementById("feedback-icon");
     const feedbackTitle = document.getElementById("feedback-title");
-    const feedbackExplanation = document.getElementById("feedback-explanation");
-    const feedbackCorrectAnswer = document.getElementById("feedback-correct-answer");
-    const correctAnswerText = document.getElementById("correct-answer-text");
+    const feedbackAnalysis = document.getElementById("feedback-analysis");
+    const modelAnswerEl = document.getElementById("model-answer");
+    const keywordTags = document.getElementById("keyword-tags");
     const quizScreen = document.getElementById("quiz-screen");
     const resultScreen = document.getElementById("result-screen");
     const finalScore = document.getElementById("final-score");
@@ -333,83 +277,86 @@
     const gradeComment = document.getElementById("grade-comment");
 
     function initQuiz() {
-      totalCountEl.textContent = quizData.length;
+      totalCountEl.textContent = conceptQuizData.length;
       showQuestion();
     }
 
     function showQuestion() {
       answered = false;
-      const data = quizData[currentQuestion];
+      const data = conceptQuizData[currentQuestion];
 
       currentIndexEl.textContent = currentQuestion + 1;
       categoryEl.textContent = data.category;
       questionText.textContent = data.question;
       
-      // Återställ formulär
       userInput.value = "";
       userInput.disabled = false;
-      userInput.className = "w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 mono text-base transition-all";
+      userInput.className = "w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm leading-relaxed transition-all resize-none";
       submitBtn.classList.remove("hidden");
       nextBtn.classList.add("hidden");
       feedbackBox.classList.add("hidden");
-      feedbackCorrectAnswer.classList.add("hidden");
 
-      const progressPercent = ((currentQuestion) / quizData.length) * 100;
+      const progressPercent = ((currentQuestion) / conceptQuizData.length) * 100;
       progressBar.style.width = `${progressPercent}%`;
 
       setTimeout(() => userInput.focus(), 50);
     }
 
-    function cleanString(str) {
-      return str.trim().toLowerCase().replace(/['"]/g, '');
-    }
-
     function handleSubmit() {
       if (answered) return;
-      
-      const rawValue = userInput.value;
-      const cleaned = cleanString(rawValue);
+      const text = userInput.value.trim().toLowerCase();
 
-      if (!cleaned) {
+      if (text.length < 5) {
+        alert("Skriv en lite fylligare förklaring med egna ord innan du granskar!");
         userInput.focus();
         return;
       }
 
       answered = true;
-      const data = quizData[currentQuestion];
-      const isCorrect = data.acceptedAnswers.some(ans => cleanString(ans) === cleaned);
-
+      const data = conceptQuizData[currentQuestion];
       userInput.disabled = true;
       submitBtn.classList.add("hidden");
       nextBtn.classList.remove("hidden");
 
-      if (isCorrect) {
+      // Analysera nyckelordsgrupper
+      let matchedGroups = 0;
+      keywordTags.innerHTML = "";
+
+      data.requiredKeywords.forEach((group, idx) => {
+        const found = group.some(kw => text.includes(kw.toLowerCase()));
+        if (found) matchedGroups++;
+
+        const tag = document.createElement("span");
+        tag.className = found 
+          ? "text-[11px] px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-700 text-emerald-300 font-medium"
+          : "text-[11px] px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 font-medium";
+        tag.textContent = (found ? "✓ " : "○ ") + group[0];
+        keywordTags.appendChild(tag);
+      });
+
+      const threshold = Math.ceil(data.requiredKeywords.length * 0.6);
+      const isApproved = matchedGroups >= threshold;
+
+      if (isApproved) {
         score++;
         scoreEl.textContent = score;
-        userInput.classList.remove("border-slate-700");
-        userInput.classList.add("border-emerald-500", "bg-emerald-950/20", "text-emerald-300");
-
-        feedbackBox.className = "rounded-2xl p-5 border border-emerald-800/60 bg-emerald-950/20 mb-6";
-        feedbackIcon.textContent = "✅";
+        feedbackBox.className = "rounded-2xl p-5 border border-emerald-800/60 bg-emerald-950/20 mb-6 space-y-4";
+        feedbackIcon.textContent = "🌟";
         feedbackTitle.className = "font-bold text-sm text-emerald-400 mb-1";
-        feedbackTitle.textContent = "Helt rätt!";
+        feedbackTitle.textContent = "Mycket bra förklarat!";
+        feedbackAnalysis.textContent = `Ditt svar fångade de viktigaste koncepten (${matchedGroups} av ${data.requiredKeywords.length} nyckelbegrepp identifierades).`;
       } else {
-        userInput.classList.remove("border-slate-700");
-        userInput.classList.add("border-rose-500", "bg-rose-950/20", "text-rose-300");
-
-        feedbackBox.className = "rounded-2xl p-5 border border-rose-800/60 bg-rose-950/20 mb-6";
-        feedbackIcon.textContent = "❌";
-        feedbackTitle.className = "font-bold text-sm text-rose-400 mb-1";
-        feedbackTitle.textContent = "Inte riktigt.";
-
-        correctAnswerText.textContent = data.displayAnswer;
-        feedbackCorrectAnswer.classList.remove("hidden");
+        feedbackBox.className = "rounded-2xl p-5 border border-amber-800/60 bg-amber-950/20 mb-6 space-y-4";
+        feedbackIcon.textContent = "📖";
+        feedbackTitle.className = "font-bold text-sm text-amber-400 mb-1";
+        feedbackTitle.textContent = "En bit på vägen – jämför med lektionssvaret:";
+        feedbackAnalysis.textContent = `Ditt svar saknade några av kärnbegreppen (${matchedGroups} av ${data.requiredKeywords.length} träffades). Läs gärna igenom mallsvaret noga!`;
       }
 
-      feedbackExplanation.textContent = data.explanation;
+      modelAnswerEl.textContent = data.modelAnswer;
       feedbackBox.classList.remove("hidden");
 
-      if (currentQuestion === quizData.length - 1) {
+      if (currentQuestion === conceptQuizData.length - 1) {
         nextBtn.querySelector("span").textContent = "Se slutresultat";
       }
 
@@ -418,7 +365,7 @@
 
     function handleNext() {
       currentQuestion++;
-      if (currentQuestion < quizData.length) {
+      if (currentQuestion < conceptQuizData.length) {
         showQuestion();
       } else {
         showResults();
@@ -430,18 +377,16 @@
       resultScreen.classList.remove("hidden");
       progressBar.style.width = "100%";
 
-      finalScore.textContent = `${score} / ${quizData.length}`;
-      const pct = Math.round((score / quizData.length) * 100);
+      finalScore.textContent = `${score} / ${conceptQuizData.length}`;
+      const pct = Math.round((score / conceptQuizData.length) * 100);
       finalPercentage.textContent = `${pct}%`;
 
-      if (pct >= 90) {
-        gradeComment.textContent = "Mästerligt! Du kan skriva och förklara koncepten från både lektion 1 och 2 helt på egen hand.";
-      } else if (pct >= 70) {
-        gradeComment.textContent = "Mycket stark insats! Du har god förståelse för både teorin, syntaxen och verktygen.";
-      } else if (pct >= 50) {
-        gradeComment.textContent = "Godkänt! Repetera gärna escape-tecken, divisionstypen (.0) och kortkommandona.";
+      if (pct >= 85) {
+        gradeComment.textContent = "Enastående resonemang! Du kan förklara de tekniska principerna och begreppen med egna ord på ett mycket moget sätt.";
+      } else if (pct >= 65) {
+        gradeComment.textContent = "Starkt jobbat! Du har en stabil konceptuell förståelse för det mesta i Programmering 1.";
       } else {
-        gradeComment.textContent = "Ta en titt på anteckningarna en vända till och testa igen – att skriva svaren själv ger bäst minnesträning!";
+        gradeComment.textContent = "Bra träning! Gå igenom mallsvaren och fundera på hur du bäst beskriver skillnaden mellan begreppen med egna ord.";
       }
     }
 
