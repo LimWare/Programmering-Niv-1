@@ -90,7 +90,7 @@
         </svg>
       </div>
       <div class="header-titles">
-        <h1>Flowchart Symbols: Visuellt Quiz</h1>
+        <h1>Flödesscheman: Symboler & Logik</h1>
         <p>Programmering 1 • Flowcharts och Processer (Baserat på lektion 13)</p>
       </div>
     </div>
@@ -132,84 +132,84 @@
 var questions = [
   {
     id: 1, type: "mc", module: "Grundsymboler",
-    q: "Vad representerar den ovala symbolen (Terminal/terminator) i ett flödesschema?",
+    q: "Vad representerar den ovala symbolen (Terminal / Terminator) i ett flödesschema?",
     hint: "Kolla på början och slutet av ett flowchart.",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><rect x="10" y="25" width="80" height="50" rx="25" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
-    options: ["Indicates start/end of the flowchart or process", "Represents an action or process", "Holds the input/output information", "Indicates the flow connection to the next symbol"],
+    options: ["Markerar start eller slut (stopp) för processen", "Representerar en handling eller process", "Håller information om indata eller utdata", "Visar flödeskopplingen till nästa symbol"],
     correct: 0,
-    expl: "Terminal (oval) markerar start (början av processen) eller end/stopp (när processen är klar)."
+    expl: "Terminal (oval) markerar alltid start (början av processen) eller slut/stopp (när processen är klar)."
   },
   {
     id: 2, type: "mc", module: "Action/Process",
     q: "Vad används rektangeln till i ett flödesschema?",
     hint: "Vad betyder 'Basic Processing Symbol'?",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><rect x="15" y="25" width="70" height="50" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
-    options: ["Indicates multiple documents or reports", "Represents different decisions emerging from different points", "Represents an action or process", "Indicates an alternate process to take place"],
+    options: ["Indikerar flera rapporter eller dokument", "Representerar olika beslut som leder åt skilda håll", "Representerar en specifik handling, process eller beräkning", "Indikerar en alternativ process som ska utföras"],
     correct: 2,
     expl: "Rektangel (Process) representerar en specifik handling, uppgift eller instruktion, till exempel en beräkning eller ett steg i en arbetsprocess."
   },
   {
     id: 3, type: "mc", module: "Decision",
-    q: "Vad betyder romben/diamanten (Decision)?",
+    q: "Vad betyder romben / diamanten (Decision)?",
     hint: "Tänk på när processen delar sig, t.ex. 'Ja' eller 'Nej'.",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><polygon points="50,10 90,50 50,90 10,50" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
-    options: ["Represents different decisions emerging from different points", "Indicates start/end of the flowchart or process", "Indicates preparation taken for the following step", "Indicates a report or a document"],
+    options: ["Visar en fråga eller ett villkor som utvärderas (t.ex. Ja/Nej)", "Markerar start eller stopp för hela processen", "Indikerar förberedelser inför nästa steg", "Representerar en sparad rapport eller fil"],
     correct: 0,
-    expl: "Romb (Beslut) visar en fråga eller ett villkor som måste utvärderas (oftast 'Ja' eller 'Nej') där processen delas upp."
+    expl: "Romb (Beslut) visar en fråga eller ett villkor som måste utvärderas (oftast 'Ja' eller 'Nej') där processen delas upp i olika vägar."
   },
   {
     id: 4, type: "mc", module: "Input/Output",
-    q: "Vad står parallellogrammet för?",
+    q: "Vad står parallellogrammet för i ett flödesschema?",
     hint: "När information matas in eller skickas ut.",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><polygon points="25,25 95,25 75,75 5,75" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
-    options: ["Represents an action or process", "Holds the input/output information", "Indicates an alternate process to take place", "Indicates the flow connection to the next symbol"],
+    options: ["Representerar en vanlig beräkningsprocess", "Innehåller indata (input) eller utdata (output)", "Indikerar en alternativ processväg", "Visar kopplingen till nästa flödessteg"],
     correct: 1,
-    expl: "Parallellogram (Indata/Utdata) används för att visa information som matas in i eller skickas ut från ett system."
+    expl: "Parallellogram (Indata/Utdata) används för att visa information som matas in i eller skickas ut från ett system (t.ex. läsa in värden eller skriva ut på skärmen)."
   },
   {
     id: 5, type: "mc", module: "Flowline",
     q: "Vad är syftet med pilar (Flowline) i ett flödesschema?",
     hint: "De binder samman formerna.",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><line x1="20" y1="50" x2="70" y2="50" stroke="#e6c260" stroke-width="5"/><polygon points="70,35 95,50 70,65" fill="#e6c260"/></svg>',
-    options: ["Start och stopp av program", "Beslut som utvärderas", "Visar stegens ordning och riktning", "Representerar en beräkning"],
+    options: ["Startar och stoppar programmet", "Utvärderar ett logiskt villkor", "Visar ordning och riktning mellan stegen", "Utför en matematisk beräkning"],
     correct: 2,
-    expl: "Pilar (Flödeslinje) visar ordning och riktning mellan stegen, hur processen fortskrider från ett steg till nästa."
+    expl: "Pilar (Flödeslinje) binder samman formerna och visar ordning och riktning mellan stegen, det vill säga hur processen fortskrider."
   },
   {
     id: 6, type: "mc", module: "Connector",
     q: "Vad används Cirkeln (Connector) till?",
     hint: "Titta på listan över symboler och deras namn.",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><circle cx="50" cy="50" r="30" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
-    options: ["Indicates the flow connection to the next symbol", "Represents an action or process", "Indicates preparation taken for the following step", "Holds the input/output information"],
+    options: ["Indikerar flödeskopplingen till nästa symbol", "Representerar en aktiv process", "Visar förberedelser inför nästa steg", "Lagrar indata och utdata"],
     correct: 0,
-    expl: "Cirkeln används som en 'Connector' för att visa flödeskopplingen till nästa symbol, ofta för att undvika långa pilar."
+    expl: "Cirkeln används som en 'Connector' för att visa flödeskopplingen till nästa symbol."
   },
   {
     id: 7, type: "mc", module: "Document",
     q: "Vilken symbol används för att indikera en rapport eller ett dokument (Document)?",
-    hint: "Det är formen som ser ut som ett papper med avriven kant.",
+    hint: "Det är formen som ser ut som ett papper med vågig kant.",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><path d="M 20 15 L 80 15 L 80 70 C 65 70 65 90 50 80 C 35 70 35 90 20 80 Z" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
-    options: ["Rektangel", "Oval", "Rektangel med vågig underkant", "Diamant"],
+    options: ["En vanlig rektangel", "En oval", "En rektangel med vågig underkant (pappersform)", "En romb"],
     correct: 2,
-    expl: "Symbolen med en vågig underkant indikerar en rapport eller ett dokument."
+    expl: "Symbolen med en vågig underkant indikerar en rapport eller ett fysiskt dokument."
   },
   {
     id: 8, type: "mc", module: "Villkor & Design",
-    q: "Enligt tipsen för att bygga ett flowchart, vad bör man skriva på pilarna som går ut från ett beslut (diamant)?",
+    q: "Enligt lektionens tips för att bygga ett flowchart, vad bör man skriva på pilarna som går ut från ett beslut (diamant)?",
     hint: "Vad är ett typiskt svar på en fråga?",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><polygon points="50,10 90,50 50,90 10,50" fill="#112033" stroke="#e6c260" stroke-width="4"/><text x="15" y="45" fill="#e6c260" font-size="16">Ja</text><text x="70" y="45" fill="#e6c260" font-size="16">Nej</text></svg>',
-    options: ["Endast siffror", "Tydligt Ja / Nej", "Namnet på processen", "Start / Slut"],
+    options: ["Endast matematiska siffror", "Tydligt Ja / Nej på pilarna", "Processens namn", "Start och Slut"],
     correct: 1,
-    expl: "Man ska skriva tydligt Ja / Nej på pilarna från ett beslut, eftersom varje beslut är en fråga."
+    expl: "Man ska skriva tydligt Ja / Nej på pilarna eftersom varje beslut i en diamant är en fråga."
   },
   {
     id: 9, type: "mc", module: "Flöde",
     q: "I vilken riktning ritas normalt ett flowchart?",
-    hint: "Hur läser man ett papper?",
+    hint: "Hur läser man ett dokument?",
     svg: '<svg viewBox="0 0 100 100" width="140" height="140"><line x1="50" y1="20" x2="50" y2="70" stroke="#e6c260" stroke-width="5"/><polygon points="35,70 50,95 65,70" fill="#e6c260"/></svg>',
-    options: ["Från höger till vänster", "Nerifrån och upp", "Uppifrån och ner", "I en cirkel"],
+    options: ["Från höger till vänster", "Nerifrån och upp", "Uppifrån och ner", "I en cirkelrörelse"],
     correct: 2,
-    expl: "Flowcharten går uppifrån och ner, och ordningen är viktig."
+    expl: "Flödesschemat går uppifrån och ner, och ordningen mellan stegen är avgörande."
   }
 ];
 
