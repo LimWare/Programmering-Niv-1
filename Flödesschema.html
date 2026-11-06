@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intensivträning: Flödesscheman & Symboler - Jensen Campus</title>
+  <style>
+    :root {
+      --bg: #060b11;
+      --card-bg: #0b1522;
+      --gold-primary: #e6c260;
+      --gold-glow: rgba(230, 194, 96, 0.28);
+      --gold-gradient: linear-gradient(135deg, #fae287 0%, #d4af37 50%, #9e7d23 100%);
+      --gold-border: rgba(212, 175, 55, 0.55);
+      --text: #f8fafc;
+      --text-muted: #9fb0c3;
+      --correct: #22c55e;
+      --wrong: #ef4444;
+      --opt-bg: #112033;
+      --opt-hover: #182c45;
+      --opt-border: rgba(212, 175, 55, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 24px 16px; }
+    .modal-container { background: var(--card-bg); width: 100%; max-width: 880px; border-radius: 26px; border: 2px solid var(--gold-border); padding: 34px 38px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px var(--gold-glow); display: flex; flex-direction: column; min-height: 760px; justify-content: space-between; }
+    .header-box { display: flex; align-items: center; gap: 20px; margin-bottom: 22px; border-bottom: 1.5px solid var(--gold-border); padding-bottom: 20px; box-shadow: 0 6px 15px -8px var(--gold-glow); }
+    .jensen-logo-svg { width: 68px; height: 68px; border-radius: 50%; background: #060b11; border: 2px solid var(--gold-primary); box-shadow: 0 0 16px var(--gold-glow); flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 3px; }
+    .header-titles h1 { font-size: 1.55rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: 0.4px; margin-bottom: 4px; }
+    .header-titles p { font-size: 0.95rem; color: var(--text-muted); letter-spacing: 0.2px; }
+    .progress-row { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .segments { display: flex; gap: 3px; flex: 1; }
+    .seg { height: 6px; flex: 1; background: #18283b; border-radius: 3px; transition: background 0.2s; }
+    .seg.correct { background: var(--correct); } .seg.wrong { background: var(--wrong); } .seg.current { background: var(--gold-primary); box-shadow: 0 0 8px var(--gold-primary); }
+    .step-text { font-size: 1rem; color: var(--gold-primary); font-weight: 700; white-space: nowrap; }
+    .pill-counter { display: flex; gap: 8px; }
+    .count-pill { font-size: 0.85rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+    .pill-red { background: rgba(239, 68, 68, 0.22); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .pill-green { background: rgba(34, 197, 94, 0.22); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .q-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .q-badge { display: inline-block; font-size: 0.8rem; font-weight: 800; color: #070e17; background: var(--gold-gradient); padding: 3px 12px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.6px; box-shadow: 0 2px 8px var(--gold-glow); }
+    .q-type-badge { display: inline-block; font-size: 0.8rem; color: var(--text-muted); background: #121f30; border: 1px solid var(--gold-border); padding: 3px 10px; border-radius: 999px; }
+    .symbol-display { display: flex; justify-content: center; align-items: center; background: rgba(17, 32, 51, 0.5); border: 1px dashed var(--gold-border); border-radius: 12px; padding: 20px; margin-bottom: 20px; min-height: 140px; }
+    .q-text { font-size: 1.28rem; font-weight: 700; line-height: 1.5; color: #ffffff; margin-bottom: 14px; text-align: center; }
+    .hint-btn { background: none; border: none; color: var(--gold-primary); font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: underline; margin-bottom: 18px; display: block; padding: 0; margin-left: auto; margin-right: auto; }
+    .hint-box { display: none; background: rgba(212, 175, 55, 0.1); border-left: 4px solid var(--gold-primary); padding: 12px 18px; border-radius: 8px; font-size: 0.98rem; color: #fef08a; margin-bottom: 18px; }
+    .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 11px; margin-bottom: 20px; }
+    .opt-card { background: var(--opt-bg); border: 1px solid var(--opt-border); border-radius: 14px; padding: 16px 20px; color: #f1f5f9; text-align: left; font-size: 1.05rem; line-height: 1.45; cursor: pointer; transition: all 0.2s ease; width: 100%; display: flex; flex-direction: column; justify-content: center; }
+    .opt-card:hover:not(:disabled) { background: var(--opt-hover); border-color: var(--gold-primary); transform: translateY(-1px); }
+    .opt-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .badge-result { font-size: 0.85rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
+    .opt-card.correct-opt { background: rgba(34, 197, 94, 0.22); border-color: var(--correct); } .opt-card.correct-opt .badge-result { background: #22c55e; color: #fff; }
+    .opt-card.wrong-opt { background: rgba(239, 68, 68, 0.22); border-color: var(--wrong); } .opt-card.wrong-opt .badge-result { background: #ef4444; color: #fff; }
+    .opt-explanation { margin-top: 10px; padding-top: 8px; font-size: 0.95rem; line-height: 1.5; color: #e2e8f0; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+    .bottom-bar { display: flex; justify-content: flex-end; gap: 14px; margin-top: 14px; }
+    .btn-action { padding: 12px 30px; border-radius: 999px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-back { background: #132438; color: #cbd5e1; border: 1px solid var(--gold-border); } .btn-back:hover:not(:disabled) { background: #1b324e; }
+    .btn-next { background: var(--gold-gradient); color: #070e17; box-shadow: 0 0 16px var(--gold-glow); } .btn-next:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-action:disabled { opacity: 0.35; cursor: not-allowed; }
+    .summary-view { display: none; text-align: center; padding: 40px 16px; }
+    .summary-view h2 { font-size: 2.2rem; margin-bottom: 12px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+    .score-badge-large { font-size: 3.8rem; font-weight: 800; color: var(--gold-primary); margin: 16px 0; text-shadow: 0 0 25px var(--gold-glow); }
+    .summary-desc { color: var(--text-muted); font-size: 1.15rem; max-width: 600px; margin: 0 auto 28px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+<div class="modal-container">
+  <div>
+    <div class="header-box">
+      <div class="jensen-logo-svg">
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#d4af37" stroke-width="2.5" />
+          <circle cx="50" cy="50" r="41" fill="none" stroke="#d4af37" stroke-width="1.2" />
+          <polygon points="50,16 52,21 57,21 53,24 55,29 50,26 45,29 47,24 43,21 48,21" fill="#d4af37"/>
+          <polygon points="63,22 64.5,25.5 68,25.5 65,28 66,31.5 63,29.5 60,31.5 61,28 58,25.5 61.5,25.5" fill="#d4af37"/>
+          <polygon points="73,34 74.5,37.5 78,37.5 75,40 76,43.5 73,41.5 70,43.5 71,40 68,37.5 71.5,37.5" fill="#d4af37"/>
+          <polygon points="58,35 59.5,38.5 63,38.5 60,41 61,44.5 58,42.5 55,44.5 56,41 53,38.5 56.5,38.5" fill="#d4af37"/>
+          <polygon points="68,48 69.5,51.5 73,51.5 70,54 71,57.5 68,55.5 65,57.5 66,54 63,51.5 66.5,51.5" fill="#d4af37"/>
+          <path d="M 33,26 L 52,26 L 52,40 C 52,45 42,48 33,48 C 24,48 24,40 24,40 L 24,26 Z" fill="none" stroke="#d4af37" stroke-width="1.2"/>
+          <text x="38" y="36" fill="#d4af37" font-size="7.5" font-family="sans-serif" font-weight="bold" text-anchor="middle">1996</text>
+          <path d="M 32,70 C 37,58 48,50 63,45" fill="none" stroke="#d4af37" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="32" y1="70" x2="63" y2="45" stroke="#d4af37" stroke-width="1" />
+          <line x1="30" y1="67" x2="68" y2="42" stroke="#d4af37" stroke-width="2.2" stroke-linecap="round"/>
+          <polygon points="68,42 62,40 64,46" fill="#d4af37" />
+          <circle cx="36" cy="62" r="5" fill="none" stroke="#d4af37" stroke-width="1.6" />
+          <path id="textPath" d="M 20,68 A 38,38 0 0,0 80,68" fill="none" />
+          <text fill="#d4af37" font-size="7.2" font-weight="bold" letter-spacing="1.5">
+            <textPath href="#textPath" startOffset="50%" text-anchor="middle">JENSEN CAMPUS</textPath>
+          </text>
+        </svg>
+      </div>
+      <div class="header-titles">
+        <h1>Flowchart Symbols: Visuellt Quiz</h1>
+        <p>Programmering 1 • Flowcharts och Processer (Baserat på lektion 13)</p>
+      </div>
+    </div>
+    <div class="progress-row" id="progressRow">
+      <div class="segments" id="segments"></div>
+      <div class="step-text" id="stepCounter">1/9</div>
+      <div class="pill-counter">
+        <div class="count-pill pill-red" id="pillWrong">✕ 0</div>
+        <div class="count-pill pill-green" id="pillCorrect">✓ 0</div>
+      </div>
+    </div>
+    <div id="quizContent">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="q-meta">
+          <span class="q-badge" id="qBadge">Kategori</span>
+          <span class="q-type-badge" id="qTypeBadge">Flerval</span>
+        </div>
+      </div>
+      <div class="symbol-display" id="symbolDisplay"></div>
+      <div class="q-text" id="qText">Laddar fråga...</div>
+      <button type="button" class="hint-btn" onclick="toggleHint()">💡 Visa ledtråd</button>
+      <div class="hint-box" id="hintBox"></div>
+      <div id="questionContainer" class="options-grid"></div>
+    </div>
+    <div class="summary-view" id="summaryView">
+      <h2>Träning genomförd!</h2>
+      <div class="score-badge-large" id="finalScore">0 / 9</div>
+      <p class="summary-desc" id="finalFeedback"></p>
+      <button type="button" class="btn-action btn-next" onclick="restartQuiz()">Gör om övningen</button>
+    </div>
+  </div>
+  <div class="bottom-bar" id="bottomBar">
+    <button type="button" class="btn-action btn-back" id="btnBack" onclick="prevQuestion()" disabled>Tillbaka</button>
+    <button type="button" class="btn-action btn-next" id="btnNext" onclick="nextQuestion()">Nästa</button>
+  </div>
+</div>
+
+<script>
+var questions = [
+  {
+    id: 1, type: "mc", module: "Grundsymboler",
+    q: "Vad representerar den ovala symbolen (Terminal/terminator) i ett flödesschema?",
+    hint: "Kolla på början och slutet av ett flowchart.",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><rect x="10" y="25" width="80" height="50" rx="25" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
+    options: ["Indicates start/end of the flowchart or process", "Represents an action or process", "Holds the input/output information", "Indicates the flow connection to the next symbol"],
+    correct: 0,
+    expl: "Terminal (oval) markerar start (början av processen) eller end/stopp (när processen är klar)."
+  },
+  {
+    id: 2, type: "mc", module: "Action/Process",
+    q: "Vad används rektangeln till i ett flödesschema?",
+    hint: "Vad betyder 'Basic Processing Symbol'?",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><rect x="15" y="25" width="70" height="50" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
+    options: ["Indicates multiple documents or reports", "Represents different decisions emerging from different points", "Represents an action or process", "Indicates an alternate process to take place"],
+    correct: 2,
+    expl: "Rektangel (Process) representerar en specifik handling, uppgift eller instruktion, till exempel en beräkning eller ett steg i en arbetsprocess."
+  },
+  {
+    id: 3, type: "mc", module: "Decision",
+    q: "Vad betyder romben/diamanten (Decision)?",
+    hint: "Tänk på när processen delar sig, t.ex. 'Ja' eller 'Nej'.",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><polygon points="50,10 90,50 50,90 10,50" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
+    options: ["Represents different decisions emerging from different points", "Indicates start/end of the flowchart or process", "Indicates preparation taken for the following step", "Indicates a report or a document"],
+    correct: 0,
+    expl: "Romb (Beslut) visar en fråga eller ett villkor som måste utvärderas (oftast 'Ja' eller 'Nej') där processen delas upp."
+  },
+  {
+    id: 4, type: "mc", module: "Input/Output",
+    q: "Vad står parallellogrammet för?",
+    hint: "När information matas in eller skickas ut.",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><polygon points="25,25 95,25 75,75 5,75" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
+    options: ["Represents an action or process", "Holds the input/output information", "Indicates an alternate process to take place", "Indicates the flow connection to the next symbol"],
+    correct: 1,
+    expl: "Parallellogram (Indata/Utdata) används för att visa information som matas in i eller skickas ut från ett system."
+  },
+  {
+    id: 5, type: "mc", module: "Flowline",
+    q: "Vad är syftet med pilar (Flowline) i ett flödesschema?",
+    hint: "De binder samman formerna.",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><line x1="20" y1="50" x2="70" y2="50" stroke="#e6c260" stroke-width="5"/><polygon points="70,35 95,50 70,65" fill="#e6c260"/></svg>',
+    options: ["Start och stopp av program", "Beslut som utvärderas", "Visar stegens ordning och riktning", "Representerar en beräkning"],
+    correct: 2,
+    expl: "Pilar (Flödeslinje) visar ordning och riktning mellan stegen, hur processen fortskrider från ett steg till nästa."
+  },
+  {
+    id: 6, type: "mc", module: "Connector",
+    q: "Vad används Cirkeln (Connector) till?",
+    hint: "Titta på listan över symboler och deras namn.",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><circle cx="50" cy="50" r="30" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
+    options: ["Indicates the flow connection to the next symbol", "Represents an action or process", "Indicates preparation taken for the following step", "Holds the input/output information"],
+    correct: 0,
+    expl: "Cirkeln används som en 'Connector' för att visa flödeskopplingen till nästa symbol, ofta för att undvika långa pilar."
+  },
+  {
+    id: 7, type: "mc", module: "Document",
+    q: "Vilken symbol används för att indikera en rapport eller ett dokument (Document)?",
+    hint: "Det är formen som ser ut som ett papper med avriven kant.",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><path d="M 20 15 L 80 15 L 80 70 C 65 70 65 90 50 80 C 35 70 35 90 20 80 Z" fill="#112033" stroke="#e6c260" stroke-width="4"/></svg>',
+    options: ["Rektangel", "Oval", "Rektangel med vågig underkant", "Diamant"],
+    correct: 2,
+    expl: "Symbolen med en vågig underkant indikerar en rapport eller ett dokument."
+  },
+  {
+    id: 8, type: "mc", module: "Villkor & Design",
+    q: "Enligt tipsen för att bygga ett flowchart, vad bör man skriva på pilarna som går ut från ett beslut (diamant)?",
+    hint: "Vad är ett typiskt svar på en fråga?",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><polygon points="50,10 90,50 50,90 10,50" fill="#112033" stroke="#e6c260" stroke-width="4"/><text x="15" y="45" fill="#e6c260" font-size="16">Ja</text><text x="70" y="45" fill="#e6c260" font-size="16">Nej</text></svg>',
+    options: ["Endast siffror", "Tydligt Ja / Nej", "Namnet på processen", "Start / Slut"],
+    correct: 1,
+    expl: "Man ska skriva tydligt Ja / Nej på pilarna från ett beslut, eftersom varje beslut är en fråga."
+  },
+  {
+    id: 9, type: "mc", module: "Flöde",
+    q: "I vilken riktning ritas normalt ett flowchart?",
+    hint: "Hur läser man ett papper?",
+    svg: '<svg viewBox="0 0 100 100" width="140" height="140"><line x1="50" y1="20" x2="50" y2="70" stroke="#e6c260" stroke-width="5"/><polygon points="35,70 50,95 65,70" fill="#e6c260"/></svg>',
+    options: ["Från höger till vänster", "Nerifrån och upp", "Uppifrån och ner", "I en cirkel"],
+    correct: 2,
+    expl: "Flowcharten går uppifrån och ner, och ordningen är viktig."
+  }
+];
+
+var currentIndex = 0;
+var userAnswers = {};
+
+function shuffleArray(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+  return arr;
+}
+
+function randomizeQuiz() {
+  shuffleArray(questions);
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    var correctText = q.options[q.correct];
+    shuffleArray(q.options);
+    q.correct = q.options.indexOf(correctText);
+  }
+}
+
+function initSegments() {
+  var segContainer = document.getElementById("segments");
+  var html = "";
+  for (var i = 0; i < questions.length; i++) {
+    html += "<div class='seg' id='seg-" + i + "'></div>";
+  }
+  segContainer.innerHTML = html;
+}
+
+function updateProgress() {
+  var total = questions.length;
+  document.getElementById("stepCounter").textContent = (currentIndex + 1) + "/" + total;
+  var correctCount = 0;
+  var wrongCount = 0;
+
+  for (var i = 0; i < questions.length; i++) {
+    var seg = document.getElementById("seg-" + i);
+    if (!seg) continue;
+    seg.className = "seg";
+    
+    if (userAnswers[i] !== undefined) {
+      if (userAnswers[i].isCorrect) {
+        seg.classList.add("correct");
+        correctCount++;
+      } else {
+        seg.classList.add("wrong");
+        wrongCount++;
+      }
+    } else if (i === currentIndex) {
+      seg.classList.add("current");
+    }
+  }
+
+  document.getElementById("pillCorrect").textContent = "✓ " + correctCount;
+  document.getElementById("pillWrong").textContent = "✕ " + wrongCount;
+}
+
+function toggleHint() {
+  var box = document.getElementById("hintBox");
+  if (box.style.display === "block") {
+    box.style.display = "none";
+  } else {
+    box.style.display = "block";
+  }
+}
+
+function loadQuestion(idx) {
+  var q = questions[idx];
+  document.getElementById("qBadge").textContent = q.module;
+  document.getElementById("qText").textContent = (idx + 1) + ". " + q.q;
+  document.getElementById("hintBox").textContent = q.hint;
+  document.getElementById("hintBox").style.display = "none";
+  document.getElementById("symbolDisplay").innerHTML = q.svg;
+
+  var container = document.getElementById("questionContainer");
+  container.innerHTML = "";
+  var answerData = userAnswers[idx];
+
+  for (var optIdx = 0; optIdx < q.options.length; optIdx++) {
+    var optText = q.options[optIdx];
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "opt-card";
+
+    var badgeHtml = "";
+    var isSelected = (answerData && answerData.selected === optIdx);
+    var isCorrectOpt = (optIdx === q.correct);
+
+    if (answerData) {
+      btn.disabled = true;
+      if (isCorrectOpt) {
+        btn.classList.add("correct-opt");
+        badgeHtml = "<span class='badge-result'>✓ Rätt svar</span>";
+      } else if (isSelected) {
+        btn.classList.add("wrong-opt");
+        badgeHtml = "<span class='badge-result'>✕ Fel svar</span>";
+      }
+    } else {
+      (function(index) {
+        btn.onclick = function() { chooseMcOption(index); };
+      })(optIdx);
+    }
+
+    var extraText = isSelected ? " (Ditt svar)" : "";
+    var explHtml = (answerData && (isCorrectOpt || isSelected)) ? "<div class='opt-explanation'>" + q.expl + "</div>" : "";
+
+    btn.innerHTML = "<div class='opt-header'><span>" + optText + "<strong>" + extraText + "</strong></span>" + badgeHtml + "</div>" + explHtml;
+    container.appendChild(btn);
+  }
+
+  document.getElementById("btnBack").disabled = (idx === 0);
+  if (idx === questions.length - 1) {
+      document.getElementById("btnNext").textContent = "Slutför";
+  } else {
+      document.getElementById("btnNext").textContent = "Nästa";
+  }
+  updateProgress();
+}
+
+function chooseMcOption(selectedIdx) {
+  if (userAnswers[currentIndex] !== undefined) return;
+  var q = questions[currentIndex];
+  userAnswers[currentIndex] = {
+    selected: selectedIdx,
+    isCorrect: (selectedIdx === q.correct)
+  };
+  loadQuestion(currentIndex);
+}
+
+function nextQuestion() {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    loadQuestion(currentIndex);
+  } else {
+    showSummary();
+  }
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    loadQuestion(currentIndex);
+  }
+}
+
+function showSummary() {
+  document.getElementById("quizContent").style.display = "none";
+  document.getElementById("progressRow").style.display = "none";
+  document.getElementById("bottomBar").style.display = "none";
+
+  var correctCount = 0;
+  for (var i = 0; i < questions.length; i++) {
+    if (userAnswers[i] && userAnswers[i].isCorrect) {
+      correctCount++;
+    }
+  }
+
+  document.getElementById("summaryView").style.display = "block";
+  document.getElementById("finalScore").textContent = correctCount + " / " + questions.length;
+
+  var pct = (correctCount / questions.length) * 100;
+  var fb = document.getElementById("finalFeedback");
+  if (pct >= 80) {
+    fb.textContent = "Fantastiskt! Du är en mästare på flödesscheman och symbolerna från lektion 13.";
+  } else if (pct >= 50) {
+    fb.textContent = "Snyggt jobbat! Du börjar få koll på symbolerna, repetera gärna skillnaden mellan Input/Output och Processer.";
+  } else {
+    fb.textContent = "Gör gärna provet en gång till! Läs förklaringarna noga så sätter sig detaljerna.";
+  }
+}
+
+function restartQuiz() {
+  currentIndex = 0;
+  userAnswers = {};
+  randomizeQuiz();
+  document.getElementById("summaryView").style.display = "none";
+  document.getElementById("quizContent").style.display = "block";
+  document.getElementById("progressRow").style.display = "flex";
+  document.getElementById("bottomBar").style.display = "flex";
+  loadQuestion(0);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  try {
+    randomizeQuiz();
+    initSegments();
+    loadQuestion(0);
+  } catch (error) {
+    document.getElementById("qText").innerHTML = "<span style='color:red;'>Något gick snett när koden laddades: " + error.message + "</span>";
+    console.error(error);
+  }
+});
+</script>
+</body>
+</html>
