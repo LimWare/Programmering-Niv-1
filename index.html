@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git, Branches, Push/Pull & Flowchart Quiz - Programmering 1</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --border: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .container { max-width: 800px; width: 100%; margin: auto; }
+        header { text-align: center; margin-bottom: 24px; padding: 20px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); }
+        h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: 8px; }
+        .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+        .filter-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
+        .filter-btn { background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: var(--accent); color: #000; font-weight: 600; border-color: var(--accent); }
+        .card { background: var(--card-bg); padding: 28px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .progress-bar { height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
+        .meta-info { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; font-weight: 600; }
+        .category-badge { background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 2px 10px; border-radius: 99px; font-size: 0.8rem; }
+        .question-text { font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; }
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn { background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border); padding: 14px 18px; border-radius: 8px; text-align: left; font-size: 1rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; }
+        .option-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(56, 189, 248, 0.05); }
+        .option-btn.correct { background: rgba(34, 197, 94, 0.2); border-color: var(--correct); color: #fff; }
+        .option-btn.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--wrong); color: #fff; }
+        .option-btn:disabled { cursor: default; }
+        .feedback-box { margin-top: 20px; padding: 16px; border-radius: 8px; background: rgba(15, 23, 42, 0.7); border-left: 4px solid var(--accent); display: none; }
+        .feedback-title { font-weight: 700; margin-bottom: 4px; }
+        .controls { margin-top: 24px; display: flex; justify-content: flex-end; }
+        .next-btn { background: var(--accent); color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: none; }
+        .next-btn:hover { background: var(--accent-hover); color: #fff; }
+        .result-screen { text-align: center; display: none; }
+        .score-circle { font-size: 3rem; font-weight: 800; color: var(--accent); margin: 20px 0; }
+        code { background: #000; padding: 2px 6px; border-radius: 4px; color: #38bdf8; font-family: monospace; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Git, Branches, Push/Pull & Flowchart Quiz</h1>
+        <p class="subtitle">Baserat på Lektion 10, 11, 13 + Nästa lektion (Push, Pull & Behörigheter)</p>
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="startQuiz('Alla')">Alla (30)</button>
+            <button class="filter-btn" onclick="startQuiz('Git Grunder')">Git Grunder</button>
+            <button class="filter-btn" onclick="startQuiz('Branches')">Branches</button>
+            <button class="filter-btn" onclick="startQuiz('Push & Pull')">Push & Pull</button>
+            <button class="filter-btn" onclick="startQuiz('Flowchart')">Flowchart</button>
+        </div>
+    </header>
+
+    <div class="card" id="quiz-card">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="meta-info">
+            <span id="question-counter">Fråga 1 av 30</span>
+            <span class="category-badge" id="category-badge">Kategori</span>
+        </div>
+        <div class="question-text" id="question-text">Laddar fråga...</div>
+        <div class="options-list" id="options-list"></div>
+        <div class="feedback-box" id="feedback-box">
+            <div class="feedback-title" id="feedback-title"></div>
+            <div id="feedback-text"></div>
+        </div>
+        <div class="controls">
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">Nästa fråga →</button>
+        </div>
+    </div>
+
+    <div class="card result-screen" id="result-screen">
+        <h2>Quiz slutfört!</h2>
+        <div class="score-circle" id="final-score">0 / 0</div>
+        <p id="result-message" style="margin-bottom: 24px; color: var(--text-muted);"></p>
+        <button class="next-btn" style="display:inline-block;" onclick="startQuiz(currentFilter)">Kör igen</button>
+    </div>
+</div>
+
+<script>
+const allQuestions = [
+    // GIT GRUNDER (Lektion 10)
+    {
+        category: "Git Grunder",
+        question: "Vad är Git enligt lektionsmaterialet?",
+        options: [
+            "En populär och kraftfull versionshanteringsprogramvara för att spåra ändringar i källkod",
+            "En molnplattform som ägs av Microsoft för att lagra hemsidor",
+            "En textredigerare som bara fungerar i Windows Command Prompt",
+            "Ett programmeringsspråk som ersätter Python"
+        ],
+        correct: 0,
+        explanation: "Git är en gratis, öppen källkods-versionshanteringsprogramvara som spårar ändringar i källkoden på ett strukturerat sätt och låter dig arbeta både online och offline."
+    },
+    {
+        category: "Git Grunder",
+        question: "Vilken är en stor fördel med hur Git hanterar arbete utan internetanslutning?",
+        options: [
+            "Git möjliggör arbete offline eftersom varje användare har en fullständig lokal kopia av projektet",
+            "Git sparar filerna tillfälligt i webbläsarens cache tills internet kommer tillbaka",
+            "Man kan bara läsa kod offline, inte göra nya commits",
+            "Det går inte att arbeta offline i Git utan GitHub Desktop"
+        ],
+        correct: 0,
+        explanation: "Varje användare har en komplett kopia (Local Repository) av projektet på sin dator, vilket gör att man kan jobba och committa helt offline."
+    },
+    {
+        category: "Git Grunder",
+        question: "Vad är skillnaden mellan Working Directory (arbetskatalog) och Repository (repo)?",
+        options: [
+            "Working Directory är mappen där du aktivt redigerar dina projektfiler; Repository (.git-mappen) är där Git lagrar historik och metadata",
+            "Working Directory ligger på GitHub medan Repository ligger på skrivbordet",
+            "Working Directory innehåller bara raderade filer medan Repository innehåller nya filer",
+            "Det är exakt samma sak men med olika namn i Windows och Linux"
+        ],
+        correct: 0,
+        explanation: "Arbetskatalogen är din projektmapp på datorn där du gör ändringar. Repot (.git-mappen inuti projektmappen) lagrar commits, referenser och metadata."
+    },
+    {
+        category: "Git Grunder",
+        question: "Vad är en 'Commit' i Git?",
+        options: [
+            "En ögonblicksbild (snapshot) av projektets aktuella status som sparas i versionshistoriken",
+            "En uppladdning av projektet direkt till en molnserver",
+            "Ett kommando för att radera oönskade grenar",
+            "En automatisk sammanslagning av två konflikterande filer"
+        ],
+        correct: 0,
+        explanation: "En commit sparar en version (snapshot) av dina stageade ändringar i Git-repositoriet tillsammans med ett beskrivande meddelande så att du kan återgå till den vid behov."
+    },
+    {
+        category: "Git Grunder",
+        question: "Vilket kommando skriver du i terminalen för att verifiera att Git är installerat och se vilken version du har?",
+        options: [
+            "git --version",
+            "git check-install",
+            "git status --v",
+            "git config -v"
+        ],
+        correct: 0,
+        explanation: "Med kommandot 'git --version' (t.ex. i Git Bash) visas den installerade versionen av Git."
+    },
+    {
+        category: "Git Grunder",
+        question: "Varför rekommenderas det starkt att använda samma e-postadress i 'git config' som på ditt GitHub-konto?",
+        options: [
+            "För att göra det lättare att identifiera dig och koppla din aktivitet/commits i projektet till rätt person",
+            "Annars kraschar terminalen när man kör git init",
+            "För att Git skickar en inloggningskod via mejl vid varje commit",
+            "Det krävs för att få tillgång till gratis-versionen av Git"
+        ],
+        correct: 0,
+        explanation: "När e-postadressen matchar mellan Git (user.email) och GitHub kopplas dina commits tydligt till din profil och aktivitet i projektet."
+    },
+    {
+        category: "Git Grunder",
+        question: "Hur konfigurerar du ditt användarnamn globalt i Git via terminalen?",
+        options: [
+            "git config --global user.name "namn"",
+            "git set user.name "namn"",
+            "git init --user "namn"",
+            "git config --unset user.name"
+        ],
+        correct: 0,
+        explanation: "Du ställer in namn och e-post med 'git config --global user.name "namn"' respektive 'git config --global user.email "email@example.com"'."
+    },
+    {
+        category: "Git Grunder",
+        question: "Vilket kommando visar alla aktiva konfigurationsinställningar i ditt Git-system (och hur avslutar man visningen)?",
+        options: [
+            "git config --list (eller git config -l), och man trycker 'q' för att avsluta",
+            "git show config, och man trycker 'Esc' för att avsluta",
+            "git status --config, och man trycker 'Ctrl+C'",
+            "git help list, och man skriver 'exit'"
+        ],
+        correct: 0,
+        explanation: "'git config --list' eller 'git config -l' visar alla inställningar, och man trycker på 'q' (quit) för att avsluta listvyn."
+    },
+    {
+        category: "Git Grunder",
+        question: "Vad gör kommandot 'git config --global --unset user.name'?",
+        options: [
+            "Det tar bort den globala konfigurationsvariabeln 'user.name'",
+            "Det återställer hela datorns Git-historik",
+            "Det byter namn på den aktiva branchen till user.name",
+            "Det öppnar konfigurationsfilen i standardtextredigeraren"
+        ],
+        correct: 0,
+        explanation: "Flaggan '--unset' tar bort den angivna konfigurationsvariabeln, medan '--edit' öppnar konfigurationsfilen i din textredigerare."
+    },
+    {
+        category: "Git Grunder",
+        question: "I vilken ordning går filerna genom Gits tre huvudsteg när du sparar arbete lokalt?",
+        options: [
+            "Working Directory → (git add) → Staging Area → (git commit) → Repository",
+            "Repository → (git init) → Working Directory → (git push) → Staging Area",
+            "Staging Area → (git commit) → Working Directory → (git add) → Repository",
+            "Working Directory → (git commit) → Staging Area → (git add) → Repository"
+        ],
+        correct: 0,
+        explanation: "Du redigerar i Working Directory, lägger till i Staging Area med 'git add', och sparar i Repository med 'git commit'."
+    },
+    {
+        category: "Git Grunder",
+        question: "I Övning 1 skapar du mappen 'proj1' och filen 'lista.py'. Vilka kommandon kör du för att initiera repot, stagea alla filer i katalogen och göra en commit?",
+        options: [
+            "git init  →  git add .  →  git commit -m "meddelande"",
+            "git start  →  git stage all  →  git save -m "meddelande"",
+            "git init  →  git commit .  →  git push "meddelande"",
+            "git new proj1  →  git add lista.py  →  git log -m "meddelande""
+        ],
+        correct: 0,
+        explanation: "'git init' skapar repot, 'git add .' (eller 'git add lista.py') stagear ändringarna och 'git commit -m "..."' sparar dem i repot."
+    },
+    {
+        category: "Git Grunder",
+        question: "Hur ser du historiken över alla tidigare commits (och deras commit-ID), och hur återgår du till en specifik tidigare commit?",
+        options: [
+            "Visar historik med 'git log' och återgår med 'git checkout <commit-ID>'",
+            "Visar historik med 'git status' och återgår med 'git reset --hard'",
+            "Visar historik med 'git history' och återgår med 'git return <ID>'",
+            "Visar historik med 'git branch' och återgår med 'git switch <ID>'"
+        ],
+        correct: 0,
+        explanation: "Enligt lektionsmaterialet används 'git log' för att se commit-IDn och 'git checkout <commit-ID>' för att gå tillbaka till en tidigare version."
+    },
+
+    // BRANCHES (Lektion 11)
+    {
+        category: "Branches",
+        question: "Vad är en Branch (gren) i Git och varför används den?",
+        options: [
+            "En kopia/egen väg av projektet från en specifik commit för att utveckla nya funktioner eller lösa problem utan att störa huvudkoden",
+            "En säkerhetskopia som bara sparas på en extern hårddisk",
+            "Ett felmeddelande som uppstår när två personer redigerar samma rad",
+            "En mapp där man lägger filer som Git ska ignorera"
+        ],
+        correct: 0,
+        explanation: "Med en branch kopierar du projektet till en egen väg, jobbar fritt där (t.ex. en ny feature eller buggfix) och kan sedan slå ihop ändringarna med huvudvägen (main/master)."
+    },
+    {
+        category: "Branches",
+        question: "Om du kör kommandot 'git branch' och får utskriften:
+* main
+  feature-branch
+  bug-fix-branch
+Vad betyder asterisken (*) framför 'main'?",
+        options: [
+            "Att 'main' är den aktiva grenen som du befinner dig i just nu",
+            "Att 'main' innehåller osparade ändringar",
+            "Att 'main' är raderad från fjärr-repot",
+            "Att 'main' är låst och inte går att redigera"
+        ],
+        correct: 0,
+        explanation: "Kommandot 'git branch' listar alla lokala grenar och markerar den aktiva grenen du befinner dig i med en asterisk (*)."
+    },
+    {
+        category: "Branches",
+        question: "Vilket kommando raderar en befintlig lokal gren med namnet 'test-branch'?",
+        options: [
+            "git branch -d test-branch",
+            "git branch --remove test-branch",
+            "git delete branch test-branch",
+            "git checkout -d test-branch"
+        ],
+        correct: 0,
+        explanation: "Enligt Lektion 11 används 'git branch -d <branch-name>' för att radera den angivna grenen."
+    },
+    {
+        category: "Branches",
+        question: "I Övning 2 (proj2) ska du skapa en ny branch som heter 'area-funktion' och byta till den direkt. Vilka två kommandon gör exakt detta (klassisk respektive modern variant)?",
+        options: [
+            "Klassisk: 'git checkout -b area-funktion' | Modern: 'git switch -c area-funktion'",
+            "Klassisk: 'git branch -b area-funktion' | Modern: 'git move -c area-funktion'",
+            "Klassisk: 'git checkout area-funktion' | Modern: 'git init -b area-funktion'",
+            "Klassisk: 'git merge -b area-funktion' | Modern: 'git pull -c area-funktion'"
+        ],
+        correct: 0,
+        explanation: "'git checkout -b <namn>' är det klassiska sättet att både skapa och byta till en ny gren, och 'git switch -c <namn>' är den moderna varianten."
+    },
+    {
+        category: "Branches",
+        question: "I Övning 2 skapar du en ny Python-fil (för cirkelns area) och committar den inne i branchen 'area-funktion'. Vad händer med filen i din arbetskatalog om du sedan växlar tillbaka till 'main' med 'git checkout main'?",
+        options: [
+            "Den nya Python-filen syns inte i 'main' eftersom den bara är committad i 'area-funktion' än så länge",
+            "Filen raderas permanent från båda brancherna",
+            "Filen kopieras automatiskt över till 'main' utan merge",
+            "Git blockerar dig från att byta branch när du har gjort en commit"
+        ],
+        correct: 0,
+        explanation: "Varje branch har sin egen historik. Filer som committats i 'area-funktion' finns bara i den grenen tills du väljer att slå ihop (mergea) grenarna."
+    },
+
+    // PUSH & PULL + NÄSTA LEKTION (Lektion 11 & Fjärr-repo)
+    {
+        category: "Push & Pull",
+        question: "Vad är skillnaden mellan ett Local Repository (lokalt repo) och ett Remote Repository (fjärr-repo)?",
+        options: [
+            "Lokalt repo ligger på din egen dator; Fjärr-repo ligger på en annan dator/server eller molnplattform som GitHub eller GitLab",
+            "Lokalt repo har inga branches; Fjärr-repo har bara branches",
+            "Lokalt repo kräver internet; Fjärr-repo fungerar bara offline",
+            "Lokalt repo sparar bara Python-filer; Fjärr-repo sparar bara HTML-filer"
+        ],
+        correct: 0,
+        explanation: "Ett Local Repository finns på din lokala enhet, medan ett Remote Repository ligger på en server/molnplattform (t.ex. GitHub/GitLab) för samarbete."
+    },
+    {
+        category: "Push & Pull",
+        question: "Vad gör kommandot 'git push'?",
+        options: [
+            "Laddar upp dina lokala commits/ändringar från ditt lokala repo till ett fjärr-repo (Remote Repository)",
+            "Hämtar hem andras ändringar från GitHub till din dator",
+            "Flyttar filer från Working Directory till Staging Area",
+            "Skapar en ny branch lokalt på hårddisken"
+        ],
+        correct: 0,
+        explanation: "Som pilen i diagrammet visar: 'git push' skickar (laddar upp) ändringar från Local Repo till Remote Repository."
+    },
+    {
+        category: "Push & Pull",
+        question: "Vad gör kommandot 'git pull'?",
+        options: [
+            "Hämtar ändringar från ett fjärr-repo (Remote Repository) och slår samman dem med ditt lokala repo",
+            "Raderar fjärr-repot på GitHub",
+            "Laddar upp lokala filer till molnet",
+            "Ångrar senaste lokala commiten utan att kontakta servern"
+        ],
+        correct: 0,
+        explanation: "'git pull' hämtar de senaste ändringarna från fjärr-repot och integrerar (slår samman) dem i ditt lokala repo."
+    },
+    {
+        category: "Push & Pull",
+        question: "Vad står det på den viktiga OBS!/IMPORTANT-sidan i slutet av Lektion 11 angående 'push' och 'pull' inför nästa lektion?",
+        options: [
+            "Alla kan pusha och pulla beroende på deras behörighet (och man ska skapa ett repo per projekt samt en ny gren per funktion)",
+            "Vem som helst på internet kan alltid pusha direkt till alla privata och publika repon utan behörighet",
+            "Bara den som skapat repot kan pulla kod, men alla kan pusha",
+            "Man får aldrig använda push och pull i samma projekt som branches"
+        ],
+        correct: 0,
+        explanation: "På sista sliden i Lektion 11 betonas tre saker: 1) Skapa ett repo för varje projekt, 2) Skapa en ny gren för varje funktion/förbättring, 3) Alla kan pusha och pulla beroende på deras behörighet."
+    },
+    {
+        category: "Push & Pull",
+        question: "Vad innebär det i praktiken på t.ex. GitHub att 'alla kan pusha och pulla beroende på deras behörighet'?",
+        options: [
+            "För ett publikt repo kan alla oftast läsa/pulla, men för att få pusha (ändra koden i repot) krävs skrivbehörighet (t.ex. som ägare eller inbjuden Collaborator)",
+            "Att man måste betala en avgift för varje git pull man gör",
+            "Att Git bara tillåter en person i världen att ha repot nedladdat åt gången",
+            "Att behörigheten styrs av vilket operativsystem (Windows eller Mac) man använder"
+        ],
+        correct: 0,
+        explanation: "Behörigheter (permissions) avgör vem som får läsa (pull/clone) respektive skriva (push) till ett fjärr-repo. I teamprojekt lägger man till medarbetare (collaborators) eller använder Pull Requests."
+    },
+    {
+        category: "Push & Pull",
+        question: "Varför är det en bra vana att köra 'git pull' innan du börjar koda eller innan du kör 'git push' i ett gemensamt projekt?",
+        options: [
+            "För att få hem kollegornas senaste ändringar till ditt lokala repo så att du jobbar mot en uppdaterad kodbas och undviker onödiga konflikter",
+            "För att tömma Staging Area på gamla filer",
+            "För att komprimera Python-filerna så att de tar mindre plats",
+            "Det behövs aldrig om man använder Git Bash"
+        ],
+        correct: 0,
+        explanation: "Genom att köra 'git pull' synkar du ditt lokala repo med fjärr-repot så att du har alla andras senaste commits innan du bygger vidare eller pushar."
+    },
+
+    // FLOWCHART (Lektion 13)
+    {
+        category: "Flowchart",
+        question: "Vad är ett flowchart (flödesschema) och vilka tre huvudområden nämns för varför man använder dem?",
+        options: [
+            "Ett visuellt diagram som visar steg, beslut och ordningsföljd i en process – används för Tydlighet, Felsökning och Utbildning",
+            "En databas för att lagra användarlösenord – används för Kryptering, Backup och Nätverk",
+            "Ett kommando i Git för att rita grafer över commits – används för Push, Pull och Merge",
+            "En mall för att skriva CSS-kod – används för Färgsättning, Typsnitt och Animation"
+        ],
+        correct: 0,
+        explanation: "Flödesscheman ritar upp hur en process eller ett program fungerar steg för steg för att planera, dokumentera och förbättra processer (Tydlighet, Felsökning, Utbildning)."
+    },
+    {
+        category: "Flowchart",
+        question: "Vilken symbol (form) i ett flödesschema kallas 'Terminator' och vad representerar den?",
+        options: [
+            "Oval – representerar Start eller Slut/Stopp i en process",
+            "Rektangel – representerar en beräkning",
+            "Romb/Diamant – representerar ett beslut",
+            "Parallellogram – representerar utskrift på skärmen"
+        ],
+        correct: 0,
+        explanation: "En Oval (Terminator) markerar alltid var flödesschemat startar (Start) och var det slutar (Slut/End/Stop)."
+    },
+    {
+        category: "Flowchart",
+        question: "Vilka former används för 1) Process/Beräkning, 2) Beslut/Villkor (Ja/Nej) samt 3) Indata/Utdata (Input/Output)?",
+        options: [
+            "1) Rektangel = Process, 2) Romb/Diamant = Beslut, 3) Parallellogram = Indata/Utdata",
+            "1) Cirkel = Process, 2) Rektangel = Beslut, 3) Triangel = Indata/Utdata",
+            "1) Parallellogram = Process, 2) Oval = Beslut, 3) Romb = Indata/Utdata",
+            "1) Romb = Process, 2) Parallellogram = Beslut, 3) Rektangel = Indata/Utdata"
+        ],
+        correct: 0,
+        explanation: "Rektangel är en handling/beräkning (t.ex. area = length * breadth), Romb/Diamant är ett villkor med Ja/Nej-vägar, och Parallellogram är inmatning/utskrift (t.ex. Ange lösenord / Print area)."
+    },
+    {
+        category: "Flowchart",
+        question: "Vilka gratis eller populära verktyg tas upp i Lektion 13 för att rita flödesscheman?",
+        options: [
+            "Canva, Miro, draw.io (diagrams.net), Figma samt Microsoft Office / Google Drive",
+            "Endast Adobe Photoshop och AutoCAD",
+            "Git Bash och Windows Anteckningar",
+            "VLC Media Player och FileZilla"
+        ],
+        correct: 0,
+        explanation: "Lektionen nämner Canva (enkelt med mallar), Miro (perfekt för grupparbete), draw.io/diagrams.net (gratis, vanligt bland utvecklare), Figma samt Office/Google Drive."
+    },
+    {
+        category: "Flowchart",
+        question: "I Övning 2 (Temperaturkontroll) kontrolleras villkoret 'Om temperatur > 0'. Vad ska ske på Ja-vägen respektive Nej-vägen enligt övningen?",
+        options: [
+            "Ja → Skriv ut 'Över fryspunkt' | Nej → Skriv ut 'Fryspunkt'",
+            "Ja → Skriv ut 'Fryspunkt' | Nej → Skriv ut 'Över fryspunkt'",
+            "Ja → Starta om programmet | Nej → Lås kontot",
+            "Ja → Beräkna medelvärde | Nej → Avsluta utan utskrift"
+        ],
+        correct: 0,
+        explanation: "Om temperaturen är större än 0 (Ja) skrivs 'Över fryspunkt' ut, annars (Nej) skrivs 'Fryspunkt' ut, följt av Slut."
+    },
+    {
+        category: "Flowchart",
+        question: "Titta på det utbyggda flödesschemat för Lösenordskontroll (Övning 3). Vad händer om lösenordet är FEL ('No' vid 'Är det Rätt?')?",
+        options: [
+            "Det visas ett felmeddelande ('Inloggning misslyckades') och därefter kontrolleras 'Finns det försök kvar?' i en ny romb",
+            "Programmet går direkt till 'Slut' utan att visa något meddelande",
+            "Användaren loggas in på ett gästkonto automatiskt",
+            "Kontot låses direkt vid allra första felaktiga försöket"
+        ],
+        correct: 0,
+        explanation: "Vid fel lösenord visas först 'Inloggning misslyckades', sedan kollar en beslutssymbol om det finns försök kvar: vid 'Yes' går pilen tillbaka till 'Ange lösenord', vid 'No' sker kontolåsning."
+    },
+    {
+        category: "Flowchart",
+        question: "I Övning 4 (Betygssättning A–F samt validering av ogiltig inmatning), vilken kontroll måste ligga ALLRA FÖRST efter 'Mata in poäng' och i vilken ordning testas betygen?",
+        options: [
+            "Först kontrolleras om poängen är ogiltig ('Poäng < 0 eller > 100?'), och därefter testas betygen uppifrån och ner med start på högsta betyg (≥ 90 för A, ≥ 80 för B osv.)",
+            "Först testas lägsta betyg (≥ 50 för E) och allra sist kontrolleras om poängen är över 100",
+            "Ordningen spelar ingen roll i ett flödesschema så länge alla romber finns med",
+            "Man kontrollerar bara betyg C och låter användaren gissa resten"
+        ],
+        correct: 0,
+        explanation: "Flödesschemat går uppifrån och ner. Först fångar man upp ogiltig inmatning (< 0 eller > 100), och sedan kollar man från högsta gränsen (≥ 90 → A, Nej → ≥ 80 → B osv.) så att t.ex. 85 poäng ger B."
+    }
+];
+
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let currentFilter = 'Alla';
+
+function startQuiz(category) {
+    currentFilter = category;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.startsWith(category));
+    });
+    if (category === 'Alla') {
+        currentQuestions = [...allQuestions];
+    } else {
+        currentQuestions = allQuestions.filter(q => q.category === category);
+    }
+    currentIndex = 0;
+    score = 0;
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('quiz-card').style.display = 'block';
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = currentQuestions[currentIndex];
+    const total = currentQuestions.length;
+    document.getElementById('question-counter').textContent = `Fråga ${currentIndex + 1} av ${total}`;
+    document.getElementById('category-badge').textContent = q.category;
+    document.getElementById('progress-fill').style.width = `${((currentIndex) / total) * 100}%`;
+    document.getElementById('question-text').textContent = q.question;
+
+    const optionsList = document.getElementById('options-list');
+    optionsList.innerHTML = '';
+
+    // Create shuffled index mapping so correct answer isn't always first
+    let indices = q.options.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+
+    indices.forEach(optIndex => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = q.options[optIndex];
+        btn.onclick = () => selectOption(btn, optIndex === q.correct, q.explanation);
+        btn.dataset.correct = (optIndex === q.correct);
+        optionsList.appendChild(btn);
+    });
+
+    document.getElementById('feedback-box').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+}
+
+function selectOption(selectedBtn, isCorrect, explanation) {
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.dataset.correct === "true") {
+            btn.classList.add('correct');
+        }
+    });
+
+    const feedbackBox = document.getElementById('feedback-box');
+    const feedbackTitle = document.getElementById('feedback-title');
+    const feedbackText = document.getElementById('feedback-text');
+
+    if (isCorrect) {
+        score++;
+        selectedBtn.classList.add('correct');
+        feedbackTitle.textContent = "Rätt svar! 🎉";
+        feedbackTitle.style.color = "var(--correct)";
+    } else {
+        selectedBtn.classList.add('wrong');
+        feedbackTitle.textContent = "Fel svar";
+        feedbackTitle.style.color = "var(--wrong)";
+    }
+
+    feedbackText.textContent = explanation;
+    feedbackBox.style.display = 'block';
+    document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if (currentIndex < currentQuestions.length) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    document.getElementById('quiz-card').style.display = 'none';
+    const resultScreen = document.getElementById('result-screen');
+    resultScreen.style.display = 'block';
+    const total = currentQuestions.length;
+    document.getElementById('final-score').textContent = `${score} / ${total}`;
+    const pct = Math.round((score / total) * 100);
+    let msg = `Du fick ${pct}% rätt! `;
+    if (pct === 100) msg += "Spikat! Du har stenkoll på både Git, branches, push/pull och flowcharts.";
+    else if (pct >= 80) msg += "Riktigt bra jobbat! Du är väl förberedd inför lektionen och övningarna.";
+    else msg += "Bra kämpat! Kör gärna igenom en vända till för att sätta alla begrepp.";
+    document.getElementById('result-message').textContent = msg;
+}
+
+startQuiz('Alla');
+</script>
+</body>
+</html>
